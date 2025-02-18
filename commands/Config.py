@@ -17,6 +17,8 @@ class Config(commands.Cog):
         self.config.command(name="reset", description="Reset all configurations to their default values")(self.reset)
         self.config.command(name="translation-reply-message", description="Leave value parameter blank to get more info")(self.translation_reply_message)
         self.config.command(name="target-language", description="Leave value parameter blank to get more info")(self.target_lang)
+        self.config.command(name="ignore-languages", description="Leave value parameter blank to get more info")(self.ignore_langs)
+        self.config.command(name="ignore-bots", description="Leave value parameter blank to get more info")(self.ignore_bots)
         # ...
         self.bot.tree.add_command(self.config)
     
@@ -93,7 +95,8 @@ class Config(commands.Cog):
             config = await get_guild_config(interaction.guild_id)
             description = f"""Current value: `{LANGUAGES[config["TARGET_LANG"]].capitalize()}`
             The language that untranslated text should be translated into.
-            Can either be a language code (such as `en`), or language name (such as `english`)."""
+            Can either be a language code (such as `en`), or language name (such as `english`).
+            Use the `/support` command to view all supported languages."""
             
             embed = discord.Embed(
                 title="Target Language",
@@ -116,13 +119,68 @@ class Config(commands.Cog):
         self, interaction: discord.Interaction,
         value: str = None
     ):
-        pass
+        await interaction.response.defer(ephemeral=True)
+        
+        if value is None:
+            config = await get_guild_config(interaction.guild_id)
+            description = f"""Current value: `{", ".join(LANGUAGES[i].capitalize() for i in config["IGNORE_LANGS"])}`
+            The language(s) that the bot should ignore.
+            Separate languages with commas (,).
+            Can either be a language code (such as `en`), or language name (such as `english`).
+            Example: `en, pl, fr`
+            Another example: `english, french, polish`"""
+            
+            embed = discord.Embed(
+                title="Ignore Languages",
+                description=description,
+                color=discord.Color.blue()
+            )
+            
+            await interaction.followup.send(embed=embed, ephemeral=True)
+        else:
+            value = value.strip().lower().replace(" ", "")
+            
+            if "," in value:
+                split_values = value.split(",")
+                
+                for i, item in enumerate(split_values):
+                    if item not in LANGUAGES.keys():
+                        if item not in LANGCODES.keys():
+                            return await interaction.followup.send(f"`{value}` is not a valid language code or name, use `/supported` to view valid languages", ephemeral=True)
+                        else:
+                            split_values[i] = LANGCODES.get(item)
+                value = split_values
+            else:
+                if value not in LANGUAGES.keys():
+                    if value not in LANGCODES.keys():
+                        return await interaction.followup.send(f"`{value}` is not a valid language code or name, use `/supported` to view valid languages", ephemeral=True)
+                    else:
+                        value = list(LANGCODES.get(value))
+            await update_guild_config(interaction.guild_id, "IGNORE_LANGS", value)
+            await interaction.followup.send(f'Successfully updated "Ignore Languages" to `{", ".join([LANGUAGES[i].capitalize() for i in value])}`', ephemeral=True)
     
     async def ignore_bots(
         self, interaction: discord.Interaction,
         value: bool = None
     ):
-        pass
+        await interaction.response.defer(ephemeral=True)
+        
+        if value is None:
+            config = await get_guild_config(interaction.guild_id)
+            description = f"""Current value: `{config["IGNORE_BOTS"]}`
+            Should the bot ignore other bots, regardless of the language they send."""
+            
+            embed = discord.Embed(
+                title="Ignore Bots",
+                description=description,
+                color=discord.Color.blue()
+            )
+            
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            
+        else:
+            await update_guild_config(interaction.guild_id, "IGNORE_BOTS", value)
+            await interaction.followup.send(f'Successfully updated "Ignore Bots" to `{value}`', ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Config(bot))
