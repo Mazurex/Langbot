@@ -3,3 +3,4 @@ googletrans==4.0.0-rc1
 python-dotenv
 asyncio
 pymongo[srv]
+motor

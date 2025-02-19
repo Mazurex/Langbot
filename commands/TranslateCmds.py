@@ -83,7 +83,7 @@ class TranslateCmds(commands.Cog):
             target = config["TARGET_LANG"]
         # If the target language is not a valid language code
         if target.lower() not in LANGUAGES.keys():
-            # If the target language is not a valid language namee
+            # If the target language is not a valid language name
             if target not in LANGCODES.keys():
                 return await interaction.response.send_message(f"`{target}` is not a valid country code/name, run `/supported` to view all valid country codes", ephemeral=True)
             else:
