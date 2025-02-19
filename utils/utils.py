@@ -1,6 +1,6 @@
 import discord
 import bot.settings as settings
-from googletrans import Translator
+from googletrans import Translator, LANGUAGES
 
 translator = Translator()
 
@@ -46,5 +46,7 @@ def format_reply(reply_text: str,
             translated = fix_mentions(translated_text, message),
             original = message.content,
             author_id = message.author.id,
-            guild_id = message.guild.id
+            guild_id = message.guild.id,
+            lang_code = detected_lang,
+            lang_name = LANGUAGES[detected_lang].capitalize()
     )

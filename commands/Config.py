@@ -94,6 +94,8 @@ class Config(commands.Cog):
             embed.add_field(name="`{original}`", value="The original untranslated message", inline=False)
             embed.add_field(name="`{author_id}`", value="The ID of the author of the message", inline=False)
             embed.add_field(name="`{guild_id}`", value="The ID of the guild of the message", inline=False)
+            embed.add_field(name="`{lang_code}`", value="The language code of the untranslated message", inline=False)
+            embed.add_field(name="`{lang_name}`", value="The language name of the untranslated message", inline=False)
             
             await interaction.followup.send(embed=embed, ephemeral=True)
             
