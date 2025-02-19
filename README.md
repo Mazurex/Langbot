@@ -28,7 +28,7 @@ This command allows users to secretly translate messages into any language.
 
 **How It Works:**
 
-1. The bot checks if the user specified a language, if they did, ensure it is valid, otherwise default to `en`.
+1. The bot checks if the user specified a language, if they did, ensure it is valid, if the use doesn't specify a language, it will default to the guild's config target language.
 2. Then the bot determines what language the `<prompt>` is in.
 3. It then translates the message using the `(language)` parameter.
 

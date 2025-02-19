@@ -3,6 +3,8 @@ from discord.ext import commands
 from googletrans import LANGUAGES, LANGCODES, Translator
 import math
 
+from db.config_manager import get_guild_config
+
 translator = Translator()
 
 class LanguagePaginator(discord.ui.View):
@@ -73,8 +75,12 @@ class TranslateCmds(commands.Cog):
     async def translate(
         self, interaction: discord.Interaction,
         text: str,
-        target: str = "en"
+        target: str = None
     ):
+        config = await get_guild_config(interaction.guild_id)
+        # If the user doesn't specify a language, set it to the target language in the guild's config
+        if target is None:
+            target = config["TARGET_LANG"]
         # If the target language is not a valid language code
         if target.lower() not in LANGUAGES.keys():
             # If the target language is not a valid language namee
