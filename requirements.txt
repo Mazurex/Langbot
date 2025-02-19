@@ -1,5 +1,5 @@
 discord.py
-googletrans==4.0.2-rc1
+googletrans==4.0.2
 python-dotenv
 asyncio
 pymongo[srv]
