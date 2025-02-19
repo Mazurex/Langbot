@@ -12,3 +12,5 @@ logs/
 *.swp
 .env
 db.txt
+pfp.png
+art/
