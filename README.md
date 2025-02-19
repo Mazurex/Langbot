@@ -44,3 +44,4 @@ This project is **completely** open-source, you may modify and improve it as you
 
 If you do want to donate, you may do so at my KoFi: https://ko-fi.com/mazurex.
 If you encounter any bugs, let me know in my discord server: https://discord.gg/AYmdn5UuwJ.
+To invite the bot: https://discord.com/oauth2/authorize?client_id=1341595906662993920&permissions=3072&integration_type=0&scope=bot+applications.commands
