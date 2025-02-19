@@ -25,9 +25,24 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 translator = Translator()
 
+status_messages = [
+    "with translations",
+    "with over 100 languages",
+    "as your interpreter",
+    "and translating"
+]
+
+async def change_status():
+    while True:
+        for status in status_messages:
+            await bot.change_presence(activity=discord.Game(name=status))
+            await asyncio.sleep(20 * 60) # 20 Minutes
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
+    bot.loop.create_task(change_status())
+    
     try:
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} slash commands")
@@ -55,9 +70,9 @@ async def on_message(message: discord.Message):
     if detected.lang and detected.lang not in config["IGNORE_LANGS"]:
         translated = await translator.translate(message.content, dest=config["TARGET_LANG"])
         if translated.text != message.content:
+            print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
             await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated.text, message, detected.lang))
             if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
-            print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
     
     await bot.process_commands(message)
 
