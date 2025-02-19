@@ -16,7 +16,7 @@ There are 2 translation features for **LangBot**:
 
 ## Automatic Translation
 
-The bot connects to a database, looking for the specific entry for that guild (creating a default one if it doesn't exist). The bot then reads every message sent, it then determines whether to translate that message based on the given configuration, if it decides to translate, it will reply the the message with the translated version, with a customizable format with placeholders (explained later).
+The bot connects to a database, looking for the specific entry for that guild (creating a default one if it doesn't exist). The bot then reads every message sent, it then determines whether to translate that message based on the given configuration, if it decides to translate, it will reply the the message with the translated version, with a customizable format with placeholders.
 
 ## Command Translation
 
@@ -33,6 +33,8 @@ One sub-command is `view` (`/config view`), this sends an embed message with the
 Another sub-command is `reset` (`/config reset`), this command resets your guilds configurations to their default values.
 Then there are subcommands specific to aspects of the bot, the value is optional for all these aspects, if you don't specify a value, the bot will instead send an embed with information regarding that option.
 All config commands are `Admin` ONLY, meaning regular users cannot modify them.
+
+There is also the `/supported` command, this shows a paginated embed of all supported language codes and names. with two buttons, one to go to the previous page, and another to go to the next page.
 
 # Extra
 
