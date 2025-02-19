@@ -48,8 +48,9 @@ async def on_message(message: discord.Message):
     detected = await translator.detect(message.content)
     if detected.lang and detected.lang not in config["IGNORE_LANGS"]:
         translated = await translator.translate(message.content, dest=config["TARGET_LANG"])
-        await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated.text, message, detected.lang))
-        if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
+        if translated.text != message.content:
+            await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated.text, message, detected.lang))
+            if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
     
     await bot.process_commands(message)
 
