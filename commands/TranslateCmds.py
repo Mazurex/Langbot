@@ -71,7 +71,7 @@ class TranslateCmds(commands.Cog):
     # Create info about the command and its paramaters
     @discord.app_commands.command(name="translate", description="Translate any text into any desired language")
     @discord.app_commands.describe(text="The text to translate")
-    @discord.app_commands.describe(target="The target language to translate to, run /supported to view valid languages. Defaults to 'en'")
+    @discord.app_commands.describe(target="The target language to translate to, run /supported to view valid languages. Defaults to the guilds target language")
     async def translate(
         self, interaction: discord.Interaction,
         text: str,
