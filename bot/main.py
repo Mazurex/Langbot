@@ -79,7 +79,7 @@ async def on_message(message: discord.Message):
     config = await get_guild_config(message.guild.id)
     
     # Only ignore this message is the author is a bot, and ignore bots is enabled in the config
-    if message.author.bot and config["IGNORE_BOTS"]:
+    if message.author.bot and config["IGNORE_BOTS"] and message.author.id != "1341595906662993920":
         return
     
     # Setup the translator environment
