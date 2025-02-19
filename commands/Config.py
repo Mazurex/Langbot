@@ -50,11 +50,13 @@ class Config(commands.Cog):
         embed.add_field(name="Ignore Bots", value=db_config["IGNORE_BOTS"], inline=False)
         
         await interaction.followup.send(embed=embed, ephemeral=True)
+        print(f"{interaction.user.display_name} used the config/view command in {interaction.channel.name}/{interaction.guild.name}")
     
     async def reset(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         await reset_guild_config(interaction.guild_id)
         await interaction.followup.send("I have reset all LangBot configurations for this guild!", ephemeral=True)
+        print(f"{interaction.user.display_name} used the config/reset command in {interaction.channel.name}/{interaction.guild.name}")
     
     async def translation_reply_message(
         self, interaction: discord.Interaction,
@@ -84,6 +86,7 @@ class Config(commands.Cog):
         else:
             await update_guild_config(interaction.guild_id, "TRANSLATE_REPLY_MESSAGE", value)
             await interaction.followup.send(f'Successfully updated "Translate Reply Message" to `{value}`', ephemeral=True)
+            print(f"{interaction.user.display_name} used the config/translation-reply-message command in {interaction.channel.name}/{interaction.guild.name}")
     
     async def target_lang(
         self, interaction: discord.Interaction,
@@ -105,6 +108,7 @@ class Config(commands.Cog):
             )
             
             await interaction.followup.send(embed=embed, ephemeral=True)
+            print(f"{interaction.user.display_name} used the config/target-lang command in {interaction.channel.name}/{interaction.guild.name}")
         else:
             value = value.lower().strip()
             if value not in LANGUAGES.keys():
@@ -137,6 +141,7 @@ class Config(commands.Cog):
             )
             
             await interaction.followup.send(embed=embed, ephemeral=True)
+            print(f"{interaction.user.display_name} used the config/ignore-langs command in {interaction.channel.name}/{interaction.guild.name}")
         else:
             value = value.strip().lower().replace(" ", "")
             
@@ -181,6 +186,7 @@ class Config(commands.Cog):
         else:
             await update_guild_config(interaction.guild_id, "IGNORE_BOTS", value)
             await interaction.followup.send(f'Successfully updated "Ignore Bots" to `{value}`', ephemeral=True)
+            print(f"{interaction.user.display_name} used the config/ignore-bots command in {interaction.channel.name}/{interaction.guild.name}")
 
 async def setup(bot):
     await bot.add_cog(Config(bot))

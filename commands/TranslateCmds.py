@@ -83,6 +83,7 @@ class TranslateCmds(commands.Cog):
             
             response = f"**[{LANGUAGES[lang_from.lang].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated.text}"
             await interaction.response.send_message(response, ephemeral=True)
+            print(f"{interaction.user.display_name} used the translate command in {interaction.channel.name}/{interaction.guild.name}")
         except Exception as e:
             await interaction.response.send_message("There was an error with this command!", ephemeral=True)
             print(f"Error with translate command: {e}")
@@ -97,6 +98,7 @@ class TranslateCmds(commands.Cog):
         embed = view.format_page()
         
         await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+        print(f"{interaction.user.display_name} used the supported command in {interaction.channel.name}/{interaction.guild.name}")
 
 async def setup(bot):
     await bot.add_cog(TranslateCmds(bot))

@@ -22,7 +22,7 @@ DEBUG_MODE = True
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 translator = Translator()
 
 @bot.event
@@ -39,6 +39,12 @@ async def load_cogs():
     await bot.load_extension("commands.Config")
 
 @bot.event
+async def on_guild_join(guild: discord.Guild):
+    print(f"Joined new guild: {guild.name} ({guild.id})")
+    
+    await get_guild_config(guild.id)
+
+@bot.event
 async def on_message(message: discord.Message):
     config = await get_guild_config(message.guild.id)
     
@@ -51,6 +57,7 @@ async def on_message(message: discord.Message):
         if translated.text != message.content:
             await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated.text, message, detected.lang))
             if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
+            print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
     
     await bot.process_commands(message)
 
