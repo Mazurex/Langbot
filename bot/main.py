@@ -1,6 +1,13 @@
 import os
+import sys
 from dotenv import load_dotenv
 load_dotenv()
+
+# Get the absolute path of the project root
+projet_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Add it to sys.path
+sys.path.insert(0, projet_root)
 
 import discord
 from discord.ext import commands
