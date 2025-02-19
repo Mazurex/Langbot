@@ -1,5 +1,6 @@
-# TODO: This file will also access the DB and get these values from there
-
+# All default settings
+# This will only be used when a guild doesn't have a config
+# or if a admin resets that guild's config
 DEFAULT_REPLY_MESSAGE = "{flag} ➜ {translated}"
 DEFAULT_TARGET_LANG = "en"
 DEFAULT_IGNORE_LANGS = ["en"]

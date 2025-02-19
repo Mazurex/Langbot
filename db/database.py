@@ -2,12 +2,11 @@ import os
 import motor.motor_asyncio
 from dotenv import load_dotenv
 
-URI = "mongodb+srv://ytmazurex:cxsVPzwJZCnVEqrC@translatebotcluster.v7aks.mongodb.net/?retryWrites=true&w=majority&appName=TranslateBotCluster"
-
-# client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("URI"))
-client = motor.motor_asyncio.AsyncIOMotorClient(URI)
+# Setup the database with the mongodb uri in the env
+client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("URI"))
 
 def get_database():
+    """Function that returns the database, and the config collection"""
     db = client["TranslateBot"]
     config_collection = db["config"]
     return db, config_collection

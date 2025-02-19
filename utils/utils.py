@@ -27,7 +27,6 @@ def cc_to_flag(country_code: str) -> str:
         return "".join(chr(127397 + ord(c)) for c in country_code.upper())
     return settings.DEFAULT_INVALID_COUNTRY_CODE_ICON
 
-# TODO : Fix this method (doesn't work righ now)
 def fix_mentions(translated: str, original: discord.message) -> str:
     """Fix discord mentions to say the users display name rather than mentioning them\n
     This fixes the issue of mutliple mentions for one message"""
@@ -41,6 +40,7 @@ def format_reply(reply_text: str,
                 translated_text: str,
                 message: discord.Message,
                 detected_lang: str) -> str:
+    """Function that formats a message based on given parameters and placeholders"""
     return reply_text.format(
             flag = cc_to_flag(detected_lang),
             translated = fix_mentions(translated_text, message),

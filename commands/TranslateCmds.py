@@ -6,6 +6,8 @@ import math
 translator = Translator()
 
 class LanguagePaginator(discord.ui.View):
+    """As there are over 300 languages, making one embed is not smart
+    So we create a paginated embed, allowing the user to cycle through pages"""
     def __init__(self, user: discord.Member, languages, chunk_size=25):
         super().__init__()
         self.user = user
@@ -60,9 +62,11 @@ class LanguagePaginator(discord.ui.View):
             await self.update_message(interaction)
 
 class TranslateCmds(commands.Cog):
+    """All commands related to translating"""
     def __init__(self, bot):
         self.bot = bot
     
+    # Create info about the command and its paramaters
     @discord.app_commands.command(name="translate", description="Translate any text into any desired language")
     @discord.app_commands.describe(text="The text to translate")
     @discord.app_commands.describe(target="The target language to translate to, run /supported to view valid languages. Defaults to 'en'")
@@ -71,16 +75,21 @@ class TranslateCmds(commands.Cog):
         text: str,
         target: str = "en"
     ):
+        # If the target language is not a valid language code
         if target.lower() not in LANGUAGES.keys():
-            if target in LANGCODES.keys():
-                target = LANGCODES.get(target)
-            else:
+            # If the target language is not a valid language namee
+            if target not in LANGCODES.keys():
                 return await interaction.response.send_message(f"`{target}` is not a valid country code/name, run `/supported` to view all valid country codes", ephemeral=True)
+            else:
+                # Set the language name into a language code
+                target = LANGCODES.get(target)
         
         try:
+            # Translate the text into the target language, as well as detect what language the original message was in
             translated = await translator.translate(text, dest=target)
             lang_from = await translator.detect(text)
             
+            # Create the response for the message, showing what language its translating from and to
             response = f"**[{LANGUAGES[lang_from.lang].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated.text}"
             await interaction.response.send_message(response, ephemeral=True)
             print(f"{interaction.user.display_name} used the translate command in {interaction.channel.name}/{interaction.guild.name}")
@@ -88,17 +97,22 @@ class TranslateCmds(commands.Cog):
             await interaction.response.send_message("There was an error with this command!", ephemeral=True)
             print(f"Error with translate command: {e}")
     
+    # Create info about the command
     @discord.app_commands.command(name="supported", description="View a paginated embed of all supported languages")
     async def supported(
         self, interaction: discord.Interaction
     ):
         await interaction.response.defer(ephemeral=True)
         
+        # Create an instance of the paginator
         view = LanguagePaginator(user=interaction.user, languages=LANGUAGES)
+        # Embed for each individual page
         embed = view.format_page()
         
         await interaction.followup.send(embed=embed, view=view, ephemeral=True)
         print(f"{interaction.user.display_name} used the supported command in {interaction.channel.name}/{interaction.guild.name}")
 
+# Setup the commands
 async def setup(bot):
+    # Add the commands to the cog
     await bot.add_cog(TranslateCmds(bot))
