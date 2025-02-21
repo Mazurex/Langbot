@@ -95,7 +95,7 @@ async def on_message(message: discord.Message):
         translated = await translator.translate(replace_mentions(message, message.content), dest=config["TARGET_LANG"])
         
         # Only send the translated message if it is NOT the same as the original message
-        if translated.text != message.content:
+        if translated.text.lower() != message.content.lower():
             print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
             # Format the reply through another function, allowing customizability for each guild
             

@@ -49,7 +49,7 @@ class LanguagePaginator(discord.ui.View):
         else:
             # If user is on the first page, go to the last page
             self.current_page = self.total_pages - 1
-            await self.update_message(interaction)
+        await self.update_message(interaction)
             
     @discord.ui.button(label=">", style=discord.ButtonStyle.blurple)
     async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -59,7 +59,7 @@ class LanguagePaginator(discord.ui.View):
         else:
             # If user is on the last page, go to the first page
             self.current_page = 0
-            await self.update_message(interaction)
+        await self.update_message(interaction)
 
 class TranslateCmds(commands.Cog):
     """All commands related to translating"""
