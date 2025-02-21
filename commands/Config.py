@@ -154,6 +154,7 @@ class Config(commands.Cog):
         self, interaction: discord.Interaction,
         value: str = None
     ):
+        # Defer the reply
         await interaction.response.defer(ephemeral=True)
         
         if value is None:
@@ -166,6 +167,7 @@ class Config(commands.Cog):
             Example: `en, pl, fr`
             Another example: `english, french, polish`"""
             
+            # An embed with information relating to the command
             embed = discord.Embed(
                 title="Ignore Languages",
                 description=description,
@@ -175,21 +177,32 @@ class Config(commands.Cog):
             
             return await interaction.followup.send(embed=embed, ephemeral=True)
         
+        # Make the value lowercase, stripped, and replacing any spaces with empty characters 
         value = value.lower().strip().replace(" ", "")
         
+        # If there are multiple languages specified
         if "," in value:
+            # Convert the value into a list, seperating each item by a comma
             value = value.split(",")
         else:
+            # Only one item in the list, still convert it into a list
             value = [value]
         
+        # Loop through the new value list
         for i, item in enumerate(value):
+            # Item is not a language code (such as "en")
             if item not in LANGUAGES.keys():
+                # Item is not a language name (such as "english")
                 if item not in LANGCODES.keys():
+                    # Not a valid language, gracefully tell user
                     return await interaction.followup.send(f"`{item}` is not a valid language code or name", ephemeral=True)
                 else:
+                    # Convert the language name into the language code
                     value[i] = LANGCODES[item]
         
+        # Update the database
         await update_guild_config(interaction.guild_id, "IGNORE_LANGS", value)
+        # Send confirmation message
         await interaction.followup.send(f'Successfully update "Ignore Languaes" to `{", ".join(value)}`', ephemeral=True)
     
     async def ignore_bots(
