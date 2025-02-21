@@ -11,7 +11,8 @@ def default_cfig(guild_id: str | None = None) -> dict:
         "TRANSLATE_REPLY_MESSAGE": settings.DEFAULT_REPLY_MESSAGE,
         "TARGET_LANG": settings.DEFAULT_TARGET_LANG,
         "IGNORE_LANGS": settings.DEFAULT_IGNORE_LANGS,
-        "IGNORE_BOTS": settings.DEFAULT_IGNORE_BOTS
+        "IGNORE_BOTS": settings.DEFAULT_IGNORE_BOTS,
+        "BLACKLISTED_TERMS": settings.DEFAULT_BLACKLISTED_TERMS,
     }
     if guild_id:
         # Append the guild id at the start of the dict if one is given

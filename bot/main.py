@@ -14,7 +14,7 @@ from discord.ext import commands
 from googletrans import Translator
 import asyncio
 
-from utils.utils import format_reply
+from utils.utils import format_reply, replace_mentions, cover_blacklisted_terms
 import bot.settings as settings
 from db.database import get_database
 from db.config_manager import get_guild_config
@@ -25,7 +25,7 @@ print(f"Database {db.name} loaded successfully!")
 print(f"Collection {config_collection.name} loaded successfully!")
 
 # Debugging mode (DEV)
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # Setup the discord bot environment
 intents = discord.Intents.default()
@@ -89,14 +89,20 @@ async def on_message(message: discord.Message):
     detected = await translator.detect(message.content)
     
     # If there is a language detected, and its a language that is not in the "ignore languages" config
-    if detected.lang and detected.lang not in config["IGNORE_LANGS"]:
+    if detected.lang and detected.lang not in config["IGNORE_LANGS"]:    
         # Translate the message into the desired langage specified in the config
-        translated = await translator.translate(message.content, dest=config["TARGET_LANG"])
+        # Also replace all mentions with [MENTION]
+        translated = await translator.translate(replace_mentions(message, message.content), dest=config["TARGET_LANG"])
+        
         # Only send the translated message if it is NOT the same as the original message
         if translated.text != message.content:
             print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
             # Format the reply through another function, allowing customizability for each guild
-            await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated.text, message, detected.lang))
+            
+            # Convert blacklisted terms into an empty string
+            translated_message = cover_blacklisted_terms(translated.text, config["BLACKLISTED_TERMS"])
+            
+            await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated_message, message, detected.lang))
             # Debugging stuff
             if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
     

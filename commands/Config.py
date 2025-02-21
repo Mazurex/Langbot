@@ -19,12 +19,14 @@ class Config(commands.Cog):
                                     default_permissions=discord.Permissions(administrator=True)
                                     )
         # Init all commands as children on config
+        description = "Leave value parameter blank to get more info"
         self.config.command(name="view", description="View the server's LangBot configurations")(self.view)
         self.config.command(name="reset", description="Reset all configurations to their default values")(self.reset)
-        self.config.command(name="translation-reply-message", description="Leave value parameter blank to get more info")(self.translation_reply_message)
-        self.config.command(name="target-language", description="Leave value parameter blank to get more info")(self.target_lang)
-        self.config.command(name="ignore-languages", description="Leave value parameter blank to get more info")(self.ignore_langs)
-        self.config.command(name="ignore-bots", description="Leave value parameter blank to get more info")(self.ignore_bots)
+        self.config.command(name="translation-reply-message", description=description)(self.translation_reply_message)
+        self.config.command(name="target-language", description=description)(self.target_lang)
+        self.config.command(name="ignore-languages", description=description)(self.ignore_langs)
+        self.config.command(name="ignore-bots", description=description)(self.ignore_bots)
+        self.config.command(name="blacklisted-terms", description=description)(self.blacklisted_terms)
         # ...
         # Add this parent command to the command tree
         self.bot.tree.add_command(self.config)
@@ -43,7 +45,10 @@ class Config(commands.Cog):
         **Ignore Languages**
         • The languages to ignore when someone sends a message.
         **Ignore Bots**
-        • Should the bot ignore other bots messages, regardless of the language their message was sent in."""
+        • Should the bot ignore other bots messages, regardless of the language their message was sent in.
+        ***Blacklisted Terms**
+        • Some terms may be translated into other languages that shouldn't be, to fix this, these terms are replaced
+          with empty strings."""
         
         # The actual embed
         embed = discord.Embed(
@@ -60,6 +65,7 @@ class Config(commands.Cog):
         embed.add_field(name="Target Language", value=LANGUAGES[db_config["TARGET_LANG"]].capitalize(), inline=False)
         embed.add_field(name="Ignore Languages", value=", ".join(code_to_name), inline=False)
         embed.add_field(name="Ignore Bots", value=db_config["IGNORE_BOTS"], inline=False)
+        embed.add_field(name="Blacklisted Terms", value=", ".join(db_config["BLACKLISTED_TERMS"]))
         
         await interaction.followup.send(embed=embed, ephemeral=True)
         print(f"{interaction.user.display_name} used the config/view command in {interaction.channel.name}/{interaction.guild.name}")
@@ -75,7 +81,6 @@ class Config(commands.Cog):
         value: str = None
     ):
         await interaction.response.defer(ephemeral=True)
-        
         if value is None:
             # Get the guilds config
             config = await get_guild_config(interaction.guild_id)
@@ -224,6 +229,38 @@ class Config(commands.Cog):
             await update_guild_config(interaction.guild_id, "IGNORE_BOTS", value)
             await interaction.followup.send(f'Successfully updated "Ignore Bots" to `{value}`', ephemeral=True)
             print(f"{interaction.user.display_name} used the config/ignore-bots command in {interaction.channel.name}/{interaction.guild.name}")
+
+    async def blacklisted_terms(
+        self, interaction: discord.Interaction,
+        value: str = None
+    ):
+        await interaction.response.defer(ephemeral=True)
+        
+        if value is None:
+            config = await get_guild_config(interaction.guild_id)
+            description = f"""Current value: `{", ".join(config["BLACKLISTED_TERMS"])}`
+            Any terms in here will be removed from the final translation.
+            Useful when there are terms that would be translated in other languages, such as 'lmaoo'.
+            Separate values with commas (,).
+            Example: `lmaoo, idk, test`"""
+            # The embed to reply with
+            embed = discord.Embed(
+                title="Blacklisted Terms",
+                description=description,
+                color=discord.Color.blue()
+            )
+            
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            print(f"{interaction.user.display_name} used the config/blacklisted-terms command in {interaction.channel.name}/{interaction.guild.name}")
+            
+        else:
+            value = value.strip().replace(" ", "")
+            if "," in value:
+                value = value.split(",")
+            else:
+                value = list(value)
+            await update_guild_config(interaction.guild_id, "BLACKLISTED_TERMS", value)
+            await interaction.followup.send(f'Successfully updated "Blacklisted Terms" to `{", ".join(value)}`', ephemeral=True)
 
 # Setup the commands
 async def setup(bot):

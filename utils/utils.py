@@ -1,6 +1,8 @@
 import discord
 import bot.settings as settings
+from db.config_manager import get_guild_config
 from googletrans import Translator, LANGUAGES
+import re
 
 translator = Translator()
 
@@ -27,15 +29,6 @@ def cc_to_flag(country_code: str) -> str:
         return "".join(chr(127397 + ord(c)) for c in country_code.upper())
     return settings.DEFAULT_INVALID_COUNTRY_CODE_ICON
 
-def fix_mentions(translated: str, original: discord.message) -> str:
-    """Fix discord mentions to say the users display name rather than mentioning them\n
-    This fixes the issue of mutliple mentions for one message"""
-
-    for user in original.mentions:
-        translated = translated.replace(f"<@{user.id}>", f"@{user.display_name}")
-        translated = translated.replace(f"@{user.id}", f"@{user.display_name}")
-    return translated
-
 def format_reply(reply_text: str,
                 translated_text: str,
                 message: discord.Message,
@@ -43,10 +36,23 @@ def format_reply(reply_text: str,
     """Function that formats a message based on given parameters and placeholders"""
     return reply_text.format(
             flag = cc_to_flag(detected_lang),
-            translated = fix_mentions(translated_text, message),
+            translated = translated_text,
             original = message.content,
             author_id = message.author.id,
             guild_id = message.guild.id,
             lang_code = detected_lang,
             lang_name = LANGUAGES[detected_lang].capitalize()
     )
+
+def replace_mentions(message: discord.Message, content: str) -> str:
+    """Replace all mentions with [MENTION]"""
+    for user in message.mentions:
+        content = re.sub(f"<@!?{user.id}>", "[MENTION]", content)
+    return content
+
+def cover_blacklisted_terms(message: str, blacklisted: iter) -> str:
+    """Replace all blacklisted terms with an empty string"""
+    for item in blacklisted:
+        if item in message:
+            message = message.replace(item, "")
+    return message

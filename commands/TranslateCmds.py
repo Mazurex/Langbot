@@ -17,13 +17,6 @@ class LanguagePaginator(discord.ui.View):
         self.chunk_size = chunk_size
         self.current_page = 0
         self.total_pages = math.ceil(len(languages) / chunk_size)
-        
-        self.update_buttons()
-    
-    def update_buttons(self):
-        """Disables buttons when on the first or last page"""
-        self.previous_page.disabled = self.current_page == 0
-        self.next_page.disabled = self.current_page == self.total_pages - 1
     
     def format_page(self):
         """Formats the embed for the current page"""
@@ -41,7 +34,6 @@ class LanguagePaginator(discord.ui.View):
     
     async def update_message(self, interaction: discord.Interaction):
         """Updates the embed when a button is clicked"""
-        self.update_buttons()
         embed = self.format_page()
         await interaction.response.edit_message(embed=embed, view=self)
     
@@ -54,6 +46,9 @@ class LanguagePaginator(discord.ui.View):
         """Go to the previous page"""
         if self.current_page > 0:
             self.current_page -= 1
+        else:
+            # If user is on the first page, go to the last page
+            self.current_page = self.total_pages - 1
             await self.update_message(interaction)
             
     @discord.ui.button(label=">", style=discord.ButtonStyle.blurple)
@@ -61,6 +56,9 @@ class LanguagePaginator(discord.ui.View):
         """Go to the next page"""
         if self.current_page < self.total_pages - 1:
             self.current_page += 1
+        else:
+            # If user is on the last page, go to the first page
+            self.current_page = 0
             await self.update_message(interaction)
 
 class TranslateCmds(commands.Cog):
