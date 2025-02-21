@@ -15,7 +15,7 @@ A powerful and open source Discord bot, **LangBot** is aimed at stopping the lan
 
 ## Commands
 
-### 🈹 Translate (`/translate <prompt> (language)`)
+### Translate (`/translate <prompt> (language)`)
 
 **Description:**
 This command allows users to secretly translate messages into any language.
@@ -40,7 +40,8 @@ Bot (Private Reply): [Polish ➜ English]
                      I am Polish
 ```
 
-[TRANSLATION COMMAND IMAGE]
+![image](https://github.com/user-attachments/assets/c6647786-a7a6-4857-82b5-a9b8301cd8be)
+
 
 ---
 
@@ -67,7 +68,8 @@ Fetches a list of **all** supported languages from the **googletrans** library, 
 /supported
 ```
 
-[SUPPORTED COMMAND IMAGE]
+![image](https://github.com/user-attachments/assets/3d41c5da-0019-4e0b-9f98-60c0696d17c8)
+
 
 ---
 
@@ -107,6 +109,8 @@ Allows the configuration of the bot in the guild, such as translation reply form
 2. Target Language: `en`
 3. Ignore Languages: `en`
 4. Ignore Bots: `true`
+
+![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
 
 ---
 
