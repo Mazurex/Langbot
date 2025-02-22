@@ -41,6 +41,10 @@ Bot (Private Reply): [Polish ➜ English]
 ```
 
 ![image](https://github.com/user-attachments/assets/c6647786-a7a6-4857-82b5-a9b8301cd8be)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 07f01caa702003f4da7216d0e8b5ad7c37a96524
 
 ---
 
@@ -68,6 +72,10 @@ Fetches a list of **all** supported languages from the **googletrans** library, 
 ```
 
 ![image](https://github.com/user-attachments/assets/3d41c5da-0019-4e0b-9f98-60c0696d17c8)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 07f01caa702003f4da7216d0e8b5ad7c37a96524
 
 ---
 
@@ -150,6 +158,8 @@ This is an extension to the original guild-based config, it allows for channels 
 **Default Values:**
 
 On the set subcommand, all parameters, besides `channel` are optional, and if left blank, it will set the value to the value in the guild-based config.
+
+![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
 
 ![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
 
