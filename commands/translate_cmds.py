@@ -3,7 +3,7 @@ from discord.ext import commands
 from googletrans import LANGUAGES, LANGCODES, Translator
 import math
 
-from db.config_manager import get_guild_config
+from db.config_manager import get_guild_config, get_channel_config
 
 translator = Translator()
 
@@ -76,9 +76,10 @@ class TranslateCmds(commands.Cog):
         target: str = None
     ):
         config = await get_guild_config(interaction.guild_id)
-        # If the user doesn't specify a language, set it to the target language in the guild's config
+        channel_config = await get_channel_config(interaction.guild_id, interaction.channel_id)
+        # If the user doesn't specify a language, set it to the target language in the guild's channel/global config
         if target is None:
-            target = config["TARGET_LANG"]
+            target = channel_config["TARGET_LANG"]
         # If the target language is not a valid language code
         if target.lower() not in LANGUAGES.keys():
             # If the target language is not a valid language name

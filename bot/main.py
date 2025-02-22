@@ -17,7 +17,7 @@ import asyncio
 from utils.utils import format_reply, replace_mentions, cover_blacklisted_terms
 import bot.settings as settings
 from db.database import get_database
-from db.config_manager import get_guild_config
+from db.config_manager import get_guild_config, get_channel_config
 
 db, config_collection = get_database()
 
@@ -63,8 +63,9 @@ async def on_ready():
 
 async def load_cogs():
     """Function to load all external commands"""
-    await bot.load_extension("commands.TranslateCmds")
-    await bot.load_extension("commands.Config")
+    await bot.load_extension("commands.translate_cmds")
+    await bot.load_extension("commands.config")
+    await bot.load_extension("commands.channel_config")
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
@@ -77,9 +78,10 @@ async def on_guild_join(guild: discord.Guild):
 async def on_message(message: discord.Message):
     # Get the guild's config
     config = await get_guild_config(message.guild.id)
+    channel_config = await get_channel_config(message.guild.id, message.channel.id)
     
-    # Only ignore this message is the author is a bot, and ignore bots is enabled in the config
-    if message.author.bot and config["IGNORE_BOTS"] and message.author.id != "1341595906662993920":
+    # Only ignore this message is the author is a bot, and ignore bots is enabled in the channel/global config
+    if message.author.bot and channel_config["IGNORE_BOTS"] and message.author.id != "1341595906662993920":
         return
     
     # Setup the translator environment
@@ -88,21 +90,28 @@ async def on_message(message: discord.Message):
     # Detect what language the message is in
     detected = await translator.detect(message.content)
     
-    # If there is a language detected, and its a language that is not in the "ignore languages" config
-    if detected.lang and detected.lang not in config["IGNORE_LANGS"]:    
+    # If there is a language detected, and its a language that is not in the "ignore languages" channel/global config
+    if detected.lang and detected.lang not in channel_config["IGNORE_LANGS"]:    
         # Translate the message into the desired langage specified in the config
         # Also replace all mentions with [MENTION]
-        translated = await translator.translate(replace_mentions(message, message.content), dest=config["TARGET_LANG"])
+        translated = await translator.translate(replace_mentions(message, message.content), dest=channel_config["TARGET_LANG"])
         
         # Only send the translated message if it is NOT the same as the original message
-        if translated.text.lower() != message.content.lower():
+        # And if the user does NOT have a blacklisted role
+        if translated.text.lower() != message.content.lower() and not any(role.id in channel_config["BLACKLISTED_ROLES"] for role in message.author.roles):
             print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
             # Format the reply through another function, allowing customizability for each guild
             
             # Convert blacklisted terms into an empty string
-            translated_message = cover_blacklisted_terms(translated.text, config["BLACKLISTED_TERMS"])
+            translated_message = cover_blacklisted_terms(translated.text, channel_config["BLACKLISTED_TERMS"])
             
-            await message.reply(format_reply(config["TRANSLATE_REPLY_MESSAGE"], translated_message, message, detected.lang))
+            formatted_reply = format_reply(channel_config["TRANSLATE_REPLY_MESSAGE"], translated_message, message, detected.lang)
+            
+            # If the config option "REPLY" is true, reply to the untranslated message, otherwise just send it in the channel
+            if channel_config["REPLY"]:
+                await message.reply(formatted_reply)
+            else:
+                await message.channel.send(formatted_reply)
             # Debugging stuff
             if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
     

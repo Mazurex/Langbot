@@ -11,11 +11,11 @@ A powerful and open source Discord bot, **LangBot** is aimed at stopping the lan
 
 ## How It Works
 
-**LangBot** interacts with the Discord API using [discord.py](https://discordpy.readthedocs.io/en/stable/), allowing for blazing fast communication, and simplicity within the source code. Translation is done with the [googletrans](https://pypi.org/project/googletrans/) Python Library, allowing for reliable and stable translation. The customizable config is held on a **MongoDB** server, meaning it is secure. You are able to customize the translation message, by default being: `{flag} ➜ {translated}` which looks like this: `🇩🇪 ➜ Hello World` (flag is shown in Discord), with lots of placeholders you are able to customize this message to your liking. The automatic translation feature looks at the guild's config for the `target language` and `ignored language(s)`, if any message is not meant to be ignored, it will be translated into the `target language`, meaning you can customize what languages the bot should ignore, and what language to translate to. The `/translate` command uses the exact same system, however only processing when the command is called, rather than every message it sees. All inputs that may require a language, such as the `(language)` parameter in `/translate` can either be the language code (such as `en`) or the language name (such as `English`).
+**LangBot** interacts with the Discord API using [discord.py](https://discordpy.readthedocs.io/en/stable/), allowing for blazing fast communication, and simplicity within the source code. Translation is done with the [googletrans](https://pypi.org/project/googletrans/) Python Library, allowing for reliable and stable translation. The customizable config is held on a **MongoDB** server, meaning it is secure. You are able to customize the translation message, by default being: `{flag} ➜ {translated}` which looks like this: `🇩🇪 ➜ Hello World` (flag is shown in Discord), with lots of placeholders you are able to customize this message to your liking. The automatic translation feature looks at the channel-based or guild-based config for the `target language` and `ignored language(s)`, if any message is not meant to be ignored, it will be translated into the `target language`, meaning you can customize what languages the bot should ignore, and what language to translate to. The `/translate` command uses the exact same system, however only processing when the command is called, rather than every message it sees. All inputs that may require a language, such as the `(language)` parameter in `/translate` can either be the language code (such as `en`) or the language name (such as `English`).
 
 ## Commands
 
-### 🈹 Translate (`/translate <prompt> (language)`)
+### Translate (`/translate <prompt> (language)`)
 
 **Description:**
 This command allows users to secretly translate messages into any language.
@@ -40,7 +40,7 @@ Bot (Private Reply): [Polish ➜ English]
                      I am Polish
 ```
 
-[TRANSLATION COMMAND IMAGE]
+![image](https://github.com/user-attachments/assets/c6647786-a7a6-4857-82b5-a9b8301cd8be)
 
 ---
 
@@ -67,14 +67,14 @@ Fetches a list of **all** supported languages from the **googletrans** library, 
 /supported
 ```
 
-[SUPPORTED COMMAND IMAGE]
+![image](https://github.com/user-attachments/assets/3d41c5da-0019-4e0b-9f98-60c0696d17c8)
 
 ---
 
 ### Admin Command: Configure The Bot (`/config {subcommand ?(value)}`)
 
 **Description:**
-Allows the configuration of the bot in the guild, such as translation reply formats, target and ignored languages and other settings, the `/config` command is just a parent command, housing a list of `subcommands`, which may or may not have an optional `value` parameter (`?` as the parameter may not exist for some subcommands), leaving the value parameter blank will display the current setting and information about that configuration option. Here's a list of subcommands:
+Allows the configuration of the bot in the guild, such as translation reply formats, target and ignored languages and other settings, the `/config` command is just a parent command, housing a list of `subcommands`, which may or may not have an optional `value` parameter (`?` as the parameter may not exist for some subcommands), leaving the value parameter blank will display the current setting and information about that configuration option. NOTE: the reset subcommand will also wipe all channel-based configs! Here's a list of subcommands:
 
 1. `/config view` - View all current configurations, with a description for each one.
 2. `/config reset` - Reset the guild's configurations to their default values.
@@ -83,12 +83,24 @@ Allows the configuration of the bot in the guild, such as translation reply form
    2. `{translated}` - The translated message.
    3. `{original}` - The original untranslated message.
    4. `{author_id}` - The ID of the author of the message.
-   5. `{guild_id}` - The ID of the guild of the message.
-   6. `{lang_code}` - The language code of the untranslated message (for example: `en`).
-   7. `{lang_name}` - The language name of the untranslated message (for example: `English`).
+   5. `{author_display_name}` - The display name of the author of the message.
+   6. `{author_username}` - The username of the author of the message.
+   7. `{author_mention}` - Mention the author of the message.
+   8. `{author_avatar}` - The avatar of the author of the message.
+   9. `{guild_id}` - The ID of the guild of the message.
+   10. `{guild_name}` - The name of the guild of the message.
+   11. `{channel_id}` - The ID of the channel of the message.
+   12. `{channel_name}` - The name of the channel of the message.
+   13. `{message_id}` - The ID of the original untranslated message.
+   14. `{message_url}` - The URL to the original untranslated message.
+   15. `{lang_code}` - The language code of the untranslated message (for example: `en`).
+   16. `{lang_name}` - The language name of the untranslated message (for example: `English`).
 4. `/config target-language (value)` - Change the language that the bot will translate messages into when replying, must be a valid language (check `/supported`).
 5. `/config ignore-languages (value)` - A list of languages to ignore, separated by commas (for example: `en, de, fr`).
 6. `/config ignore-bots (value)` - A true or false statement, if `false` the bot will translate messages from other bots (if their languages are not in the ignored list).
+7. `/config blacklisted-terms (value)` - A list of words that are not allowed to be translated, if the translated message contains one of these, it will not be sent.
+8. `/config reply (value)` - A true of false statement, if `false` the bot will send the message in the channel, otherwise it will reply to the untranslated message.
+9. `/config blacklisted-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "\*" to disable this.
 
 **Usage:**
 
@@ -99,6 +111,9 @@ Allows the configuration of the bot in the guild, such as translation reply form
 /config target-language en
 /config ignore-languages en, fr, de
 /config ignore-bots true
+/config blacklisted-terms hello, world
+/config reply false
+/config blacklisted_roles @owner @coolguy
 ```
 
 **Default Values:**
@@ -107,6 +122,36 @@ Allows the configuration of the bot in the guild, such as translation reply form
 2. Target Language: `en`
 3. Ignore Languages: `en`
 4. Ignore Bots: `true`
+5. Blacklisted Terms: `"lmaoo", "wdym", "ik"`
+6. Reply: `true`
+7. Blacklisted Roles: `none`
+
+![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
+
+---
+
+### Admin Command: Configure The Bot 2.0 (`/channel-config {subcommand ?(value(s))}`)
+
+**Description:**
+This is an extension to the original guild-based config, it allows for channels to have custom configurations, alongside the guild-based one, meaning that you can have your main guild-based config as a default, and then set a few channels to contain other configuration options, outside the default config, allowing you to have other language channels, which can translate into that channels language. All (other than channel) parameters in set are optional, see default values. Here's a list of subcommands:
+
+1. `/channel-config view` - View all channel configurations as a paginated list, alongside information regarding channel configs.
+2. `/channel-config set {channel} (values)` - Set a channel config for a specific channel, the parameters will match the `/config` parameters.
+3. `/channel-config remove {channel}` - Remove a channel configuration from a specific channel.
+
+**Usage:**
+
+```
+/channel-config view
+/channel-config set #general translate_reply_message = "{translated} = {flag}" ignore_languages = en,fr
+/channel-config remove #general
+```
+
+**Default Values:**
+
+On the set subcommand, all parameters, besides `channel` are optional, and if left blank, it will set the value to the value in the guild-based config.
+
+![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
 
 ---
 

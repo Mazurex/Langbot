@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from db.config_manager import get_guild_config, update_guild_config, reset_guild_config
 from googletrans import LANGUAGES, LANGCODES
+from utils.utils import f_translation_reply_message, f_target_lang, f_ignore_langs, f_ignore_bots, f_blacklisted_terms, f_reply, f_blacklisted_roles
 
 # All customize commands here have an option value parameter
 # If no value is given, instead send an embed for what the command does
@@ -27,6 +28,8 @@ class Config(commands.Cog):
         self.config.command(name="ignore-languages", description=description)(self.ignore_langs)
         self.config.command(name="ignore-bots", description=description)(self.ignore_bots)
         self.config.command(name="blacklisted-terms", description=description)(self.blacklisted_terms)
+        self.config.command(name="reply", description=description)(self.reply)
+        self.config.command(name="blacklisted-roles", description=description)(self.blacklisted_roles)
         # ...
         # Add this parent command to the command tree
         self.bot.tree.add_command(self.config)
@@ -38,7 +41,9 @@ class Config(commands.Cog):
         db_config = await get_guild_config(interaction.guild_id)
         
         # Description of the embed
-        description = """**Translation Reply Message**
+        description = """config refers to guild-based config, or guild-default config.
+        You can set a channel based config with `/channel-config`, more information in `/channel-config view`
+        **Translation Reply Message**
         • Message format when the bot replies with a translation.
         **Target Language**
         • The language the bot should translate to.
@@ -46,9 +51,12 @@ class Config(commands.Cog):
         • The languages to ignore when someone sends a message.
         **Ignore Bots**
         • Should the bot ignore other bots messages, regardless of the language their message was sent in.
-        ***Blacklisted Terms**
-        • Some terms may be translated into other languages that shouldn't be, to fix this, these terms are replaced
-          with empty strings."""
+        **Blacklisted Terms**
+        • Some terms may be translated into other languages that shouldn't be, to fix this, these terms are replaced with empty strings.
+        **Reply**
+        • Should the bot reply to the original untranslatd message.
+        **Blacklisted Roles**
+        • The bot will not translate any messages from users who have any blacklisted words, you can enter a mention, or a role ID, if you want to disable this feature, just enter '*' to set None"""
         
         # The actual embed
         embed = discord.Embed(
@@ -64,8 +72,10 @@ class Config(commands.Cog):
         embed.add_field(name="Translation Reply Message", value=f"`{db_config['TRANSLATE_REPLY_MESSAGE']}`", inline=False)
         embed.add_field(name="Target Language", value=LANGUAGES[db_config["TARGET_LANG"]].capitalize(), inline=False)
         embed.add_field(name="Ignore Languages", value=", ".join(code_to_name), inline=False)
-        embed.add_field(name="Ignore Bots", value=db_config["IGNORE_BOTS"], inline=False)
-        embed.add_field(name="Blacklisted Terms", value=", ".join(db_config["BLACKLISTED_TERMS"]))
+        embed.add_field(name="Ignore Bots", value="Yes" if db_config["IGNORE_BOTS"] else "No", inline=False)
+        embed.add_field(name="Blacklisted Terms", value=", ".join(db_config["BLACKLISTED_TERMS"]), inline=False)
+        embed.add_field(name="Reply", value="Yes" if db_config["REPLY"] else "No", inline=False)
+        embed.add_field(name="Blacklisted Roles", value=", ".join(f"<@&{value}>" for value in db_config["BLACKLISTED_ROLES"]))
         
         await interaction.followup.send(embed=embed, ephemeral=True)
         print(f"{interaction.user.display_name} used the config/view command in {interaction.channel.name}/{interaction.guild.name}")
@@ -105,10 +115,9 @@ class Config(commands.Cog):
             await interaction.followup.send(embed=embed, ephemeral=True)
             
         else:
-            # Update the config with the desired value
-            await update_guild_config(interaction.guild_id, "TRANSLATE_REPLY_MESSAGE", value)
+            # External function
+            value = await f_translation_reply_message(value, interaction)
             await interaction.followup.send(f'Successfully updated "Translate Reply Message" to `{value}`', ephemeral=True)
-            print(f"{interaction.user.display_name} used the config/translation-reply-message command in {interaction.channel.name}/{interaction.guild.name}")
     
     async def target_lang(
         self, interaction: discord.Interaction,
@@ -135,17 +144,8 @@ class Config(commands.Cog):
                 await interaction.followup.send(embed=embed, ephemeral=True)
                 print(f"{interaction.user.display_name} used the config/target-lang command in {interaction.channel.name}/{interaction.guild.name}")
             else:
-                # Clean the value, making it lowercase and stripped
-                value = value.lower().strip()
-                # If the value is not a valid language code (such as "en")
-                if value not in LANGUAGES.keys():
-                    # If the value is not a valid language name (such as "england")
-                    if value not in LANGCODES.keys():
-                        return await interaction.followup.send(f"`{value}` is an invalid language, use the `/supported` command to view all valid languages")
-                    else:
-                        # If the value is a valid country name, convert it into its key code
-                        value = LANGCODES.get(value)
-                await update_guild_config(interaction.guild_id, "TARGET_LANG", value)
+                # External function
+                value = await f_target_lang(value, interaction)
                 await interaction.followup.send(f'Successfully updated "Target Language" to `{LANGUAGES[value].capitalize()}`', ephemeral=True)
         except Exception as e:
             print(e)
@@ -176,32 +176,9 @@ class Config(commands.Cog):
             )
             
             return await interaction.followup.send(embed=embed, ephemeral=True)
-        
-        # Make the value lowercase, stripped, and replacing any spaces with empty characters 
-        value = value.lower().strip().replace(" ", "")
-        
-        # If there are multiple languages specified
-        if "," in value:
-            # Convert the value into a list, seperating each item by a comma
-            value = value.split(",")
-        else:
-            # Only one item in the list, still convert it into a list
-            value = [value]
-        
-        # Loop through the new value list
-        for i, item in enumerate(value):
-            # Item is not a language code (such as "en")
-            if item not in LANGUAGES.keys():
-                # Item is not a language name (such as "english")
-                if item not in LANGCODES.keys():
-                    # Not a valid language, gracefully tell user
-                    return await interaction.followup.send(f"`{item}` is not a valid language code or name", ephemeral=True)
-                else:
-                    # Convert the language name into the language code
-                    value[i] = LANGCODES[item]
-        
-        # Update the database
-        await update_guild_config(interaction.guild_id, "IGNORE_LANGS", value)
+
+        # External function
+        value = await f_ignore_langs(value, interaction)
         # Send confirmation message
         await interaction.followup.send(f'Successfully update "Ignore Languaes" to `{", ".join(value)}`', ephemeral=True)
     
@@ -214,7 +191,7 @@ class Config(commands.Cog):
         if value is None:
             # Get the config of the guild
             config = await get_guild_config(interaction.guild_id)
-            description = f"""Current value: `{config["IGNORE_BOTS"]}`
+            description = f"""Current value: `{"Yes" if config["IGNORE_BOTS"] else "No"}`
             Should the bot ignore other bots, regardless of the language they send."""
             
             # The embed to reply with
@@ -227,9 +204,9 @@ class Config(commands.Cog):
             await interaction.followup.send(embed=embed, ephemeral=True)
             
         else:
-            await update_guild_config(interaction.guild_id, "IGNORE_BOTS", value)
-            await interaction.followup.send(f'Successfully updated "Ignore Bots" to `{value}`', ephemeral=True)
-            print(f"{interaction.user.display_name} used the config/ignore-bots command in {interaction.channel.name}/{interaction.guild.name}")
+            # External command
+            value = await f_ignore_bots(value, interaction)
+            await interaction.followup.send(f'Successfully updated "Ignore Bots" to `{"Yes" if value else "No"}`', ephemeral=True)
 
     async def blacklisted_terms(
         self, interaction: discord.Interaction,
@@ -255,13 +232,65 @@ class Config(commands.Cog):
             print(f"{interaction.user.display_name} used the config/blacklisted-terms command in {interaction.channel.name}/{interaction.guild.name}")
             
         else:
-            value = value.strip().replace(" ", "")
-            if "," in value:
-                value = value.split(",")
-            else:
-                value = [value]
-            await update_guild_config(interaction.guild_id, "BLACKLISTED_TERMS", value)
+            value = await f_blacklisted_terms(value, interaction)
+            
             await interaction.followup.send(f'Successfully updated "Blacklisted Terms" to `{", ".join(value)}`', ephemeral=True)
+
+    async def reply(
+        self, interaction: discord.Interaction,
+        value: bool = None
+    ):
+        await interaction.response.defer(ephemeral=True)
+        
+        if value is None:
+            # Get the config of the guild
+            config = await get_guild_config(interaction.guild_id)
+            description = f"""Current value: `{"Yes" if config["REPLY"] else "No"}`
+            Should the bot reply to the original untranslated message"""
+            
+            # The embed to reply with
+            embed = discord.Embed(
+                title="Reply",
+                description=description,
+                color=discord.Color.blue()
+            )
+            
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            
+        else:
+            # External command
+            value = await f_reply(value, interaction)
+            await interaction.followup.send(f'Successfully updated "Reply" to `{"Yes" if value else "No"}`', ephemeral=True)
+
+    async def blacklisted_roles(
+        self, interaction: discord.Interaction,
+        value: str = None
+    ):
+        await interaction.response.defer(ephemeral=True)
+        
+        if value is None:
+            # Get the config of the guild
+            config = await get_guild_config(interaction.guild_id)
+            description = f"""Current value: `{", ".join(config["BLACKLISTED_ROLES"]) if len(config["BLACKLISTED_ROLES"]) > 0 else "nothing"}`
+            If a user has any of these roles, the bot will not translate their messages.
+            You can enter role mentions, everything else will be ignored."""
+            # The embed to reply with
+            embed = discord.Embed(
+                title="Blacklisted Roles",
+                description=description,
+                color=discord.Color.blue()
+            )
+            
+            return await interaction.followup.send(embed=embed, ephemeral=True)
+        result, value = await f_blacklisted_roles(value, interaction)
+
+        if result is False:
+            return await interaction.followup.send(f"All roles given were invalid, are they correct? Are they in this guild?", ephemeral=True)
+        if len(value) == 0:
+            return await interaction.followup.send(f'Successfully set "Blacklisted Roles" to `nothing`')
+
+        await interaction.followup.send(f'Successfully updated "Blacklisted Roles" to {", ".join([f"<@&{role_id}>" for role_id in value])}', ephemeral=True)
+
 
 # Setup the commands
 async def setup(bot):
