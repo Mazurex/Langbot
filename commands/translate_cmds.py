@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from googletrans import LANGUAGES, LANGCODES, Translator
+from utils.utils import translate
 import math
 
 from db.config_manager import get_guild_config, get_channel_config
@@ -91,7 +92,7 @@ class TranslateCmds(commands.Cog):
         
         try:
             # Translate the text into the target language, as well as detect what language the original message was in
-            translated = await translator.translate(text, dest=target)
+            translated = translate(text, target_lang=target)
             lang_from = await translator.detect(text)
             
             # Create the response for the message, showing what language its translating from and to

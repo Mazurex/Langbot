@@ -3,6 +3,7 @@ import bot.settings as settings
 from db.config_manager import get_guild_config, update_guild_config
 from googletrans import Translator, LANGUAGES, LANGCODES
 import re
+from deep_translator import GoogleTranslator
 
 translator = Translator()
 
@@ -69,6 +70,13 @@ def cover_blacklisted_terms(message: str, blacklisted: iter) -> str:
 
 def internal_print_log_message(interaction, command_name = "UNKNOWN") -> None:
     print(f"{interaction.user.display_name} used the {command_name} command in {interaction.channel.name}/{interaction.guild.name}")
+
+def translate(text: str, target_lang: str = "en", source_lang: str = "auto"):
+    translator = GoogleTranslator(source=source_lang, target=target_lang)
+    try:
+        return translator.translate(text)
+    except:
+        return None
 
 # Dupe commands (channel-config is sorta a version of config commands, to prevent duplication we make one general set of functions)
 
