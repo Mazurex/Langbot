@@ -19,10 +19,9 @@ sys.path.insert(0, projet_root)
 
 import discord
 from discord.ext import commands
-from googletrans import Translator
 import asyncio
 
-from utils.utils import format_reply, replace_mentions, cover_blacklisted_terms, translate
+from utils.utils import format_reply, replace_mentions, cover_blacklisted_terms, translate, valid_code, detect
 import bot.settings as settings
 from db.database import get_database
 from db.config_manager import get_guild_config, get_channel_config
@@ -99,11 +98,8 @@ async def on_message(message: discord.Message):
     if message.author.bot and channel_config["IGNORE_BOTS"] and message.author.id != "1341595906662993920":
         return
     
-    # Setup the translation detection environment
-    translator = Translator()
-    
     # Detect what language the message is in
-    detected = await translator.detect(message.content)
+    detected = detect(message.content)
     
     # If there is a language detected, and its a language that is not in the "ignore languages" channel/global config
     if detected.lang and detected.lang not in channel_config["IGNORE_LANGS"]:    

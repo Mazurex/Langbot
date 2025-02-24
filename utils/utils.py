@@ -1,9 +1,9 @@
 import discord
 import bot.settings as settings
-from db.config_manager import get_guild_config, update_guild_config
 from googletrans import Translator, LANGUAGES, LANGCODES
 import re
 from deep_translator import GoogleTranslator
+from langdetect import detect, DetectorFactory
 
 translator = Translator()
 
@@ -78,6 +78,25 @@ def translate(text: str, target_lang: str = "en", source_lang: str = "auto"):
     except:
         return None
 
+def detect_lang(prompt: str):
+    """A function to detect the language of a given prompt"""
+    DetectorFactory.seed(0)
+    detected = detect(prompt)
+    if detected is not None and detected != prompt:
+        return detected
+    return None
+
+def valid_code(code: str):
+    """Validate whether the given language code is a real language code.
+    Returns is_valid and the code
+    If the given code is the language name, it will be converted into the code"""
+    if code not in LANGUAGES.keys():
+        if code not in LANGUAGES.values():
+            return False, code
+        else:
+            code = {v: k for k, v in LANGUAGES.items()}[code]
+    return True, code
+
 # Dupe commands (channel-config is sorta a version of config commands, to prevent duplication we make one general set of functions)
 
 async def f_translation_reply_message(value: str, interaction: discord.Interaction, supress: bool = False) -> str:
@@ -88,14 +107,12 @@ async def f_translation_reply_message(value: str, interaction: discord.Interacti
 async def f_target_lang(value: str, interaction: discord.Interaction, supress: bool = False) -> str:
     # Clean the value, making it lowercase and stripped
     value = value.lower().strip()
-    # If the value is not a valid language code (such as "en")
-    if value not in LANGUAGES.keys():
-        # If the value is not a valid language name (such as "england")
-        if value not in LANGCODES.keys():
-            return await interaction.followup.send(f"`{value}` is an invalid language, use the `/supported` command to view all valid languages")
-        else:
-            # If the value is a valid country name, convert it into its key code
-            value = LANGCODES.get(value)
+    
+    is_valid, value = valid_code(value)
+
+    if not is_valid:
+        return await interaction.followup.send(f"`{value}` is an invalid language, use the `/supported` command to view all valid languages")
+
     await update_guild_config(interaction.guild_id, "TARGET_LANG", value)
     if supress is False: internal_print_log_message(interaction, "config/target-language")
     return value
@@ -114,15 +131,11 @@ async def f_ignore_langs(value: str, interaction: discord.Interaction, supress: 
     
     # Loop through the new value list
     for i, item in enumerate(value):
-        # Item is not a language code (such as "en")
-        if item not in LANGUAGES.keys():
-            # Item is not a language name (such as "english")
-            if item not in LANGCODES.keys():
-                # Not a valid language, gracefully tell user
-                return await interaction.followup.send(f"`{item}` is not a valid language code or name", ephemeral=True)
-            else:
-                # Convert the language name into the language code
-                value[i] = LANGCODES[item]
+        is_valid, code = valid_code(item)
+        if not is_valid:
+            return await interaction.followup.send(f"`{item}` is not a valid language code or name", ephemeral=True)
+        value[i] = code
+
     if supress is False: internal_print_log_message(interaction, "config/ignore-languages")
     
     # Update the database

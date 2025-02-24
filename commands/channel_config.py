@@ -2,7 +2,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from db.config_manager import get_guild_config, set_channel_config, remove_channel_config
-from googletrans import LANGUAGES, LANGCODES
 from utils.utils import internal_print_log_message
 
 # All customize commands here have an option value parameter

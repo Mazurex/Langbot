@@ -3,4 +3,5 @@ googletrans==4.0.2
 python-dotenv
 asyncio
 pymongo[srv]
-motor
+deep-translator
+langdetect

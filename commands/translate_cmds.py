@@ -1,12 +1,10 @@
 import discord
 from discord.ext import commands
-from googletrans import LANGUAGES, LANGCODES, Translator
-from utils.utils import translate
+from googletrans import LANGUAGES
+from utils.utils import translate, detect, valid_code
 import math
 
 from db.config_manager import get_guild_config, get_channel_config
-
-translator = Translator()
 
 class LanguagePaginator(discord.ui.View):
     """As there are over 300 languages, making one embed is not smart
@@ -81,19 +79,16 @@ class TranslateCmds(commands.Cog):
         # If the user doesn't specify a language, set it to the target language in the guild's channel/global config
         if target is None:
             target = channel_config["TARGET_LANG"]
-        # If the target language is not a valid language code
-        if target.lower() not in LANGUAGES.keys():
-            # If the target language is not a valid language name
-            if target not in LANGCODES.keys():
-                return await interaction.response.send_message(f"`{target}` is not a valid country code/name, run `/supported` to view all valid country codes", ephemeral=True)
-            else:
-                # Set the language name into a language code
-                target = LANGCODES.get(target)
         
+        is_valid, target = valid_code(target.lower())
+
+        if not is_valid:
+            return await interaction.response.send_message(f"`{target}` is not a valid country code/name, run `/supported` to view all valid country codes", ephemeral=True)
+
         try:
             # Translate the text into the target language, as well as detect what language the original message was in
             translated = translate(text, target_lang=target)
-            lang_from = await translator.detect(text)
+            lang_from = detect(text)
             
             # Create the response for the message, showing what language its translating from and to
             response = f"**[{LANGUAGES[lang_from.lang].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated.text}"
