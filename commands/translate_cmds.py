@@ -91,7 +91,7 @@ class TranslateCmds(commands.Cog):
             lang_from = detect(text)
             
             # Create the response for the message, showing what language its translating from and to
-            response = f"**[{LANGUAGES[lang_from.lang].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated.text}"
+            response = f"**[{LANGUAGES[lang_from].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated}"
             await interaction.response.send_message(response, ephemeral=True)
             print(f"{interaction.user.display_name} used the translate command in {interaction.channel.name}/{interaction.guild.name}")
         except Exception as e:

@@ -21,7 +21,7 @@ import discord
 from discord.ext import commands
 import asyncio
 
-from utils.utils import format_reply, replace_mentions, cover_blacklisted_terms, translate, valid_code, detect
+from utils.utils import replace_mentions, cover_blacklisted_terms, translate, detect_lang, format_reply
 import bot.settings as settings
 from db.database import get_database
 from db.config_manager import get_guild_config, get_channel_config
@@ -30,7 +30,6 @@ db, config_collection = get_database()
 
 print(f"Database {db.name} loaded successfully!")
 print(f"Collection {config_collection.name} loaded successfully!")
-
 # Debugging mode (DEV)
 DEBUG_MODE = True
 
@@ -99,36 +98,41 @@ async def on_message(message: discord.Message):
         return
     
     # Detect what language the message is in
-    detected = detect(message.content)
+    detected = detect_lang(message.content)
     
     # If there is a language detected, and its a language that is not in the "ignore languages" channel/global config
-    if detected.lang and detected.lang not in channel_config["IGNORE_LANGS"]:    
+    if detected and detected not in channel_config["IGNORE_LANGS"]:
         # Translate the message into the desired langage specified in the config
         # Also replace all mentions with [MENTION]
         translated = translate(replace_mentions(message, message.content), channel_config["TARGET_LANG"])
         
-        # If the value of translate is None, the detected language is not valid
-        if translate is None:
-            print(f"{detected} is not a valid language to translate!")
-        else:
-            # Only send the translated message if it is NOT the same as the original message
-            # And if the user does NOT have a blacklisted role
-            if translated.lower() != message.content.lower() and not any(role.id in channel_config["BLACKLISTED_ROLES"] for role in message.author.roles):
-                print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
-                # Format the reply through another function, allowing customizability for each guild
-                
-                # Convert blacklisted terms into an empty string
-                translated_message = cover_blacklisted_terms(translated, channel_config["BLACKLISTED_TERMS"])
-                
-                formatted_reply = format_reply(channel_config["TRANSLATE_REPLY_MESSAGE"], translated_message, message, detected.lang)
-                
-                # If the config option "REPLY" is true, reply to the untranslated message, otherwise just send it in the channel
-                if channel_config["REPLY"]:
-                    await message.reply(formatted_reply)
-                else:
-                    await message.channel.send(formatted_reply)
-                # Debugging stuff
-                if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
+        def contains_blacklisted(text: str, blacklisted_terms: list) -> bool:
+            """A function that returns true if a given string contains a list of blacklisted terms, otherwise false"""
+            for word in text.split():
+                if word in blacklisted_terms:
+                    return True
+            return False
+
+        # Send the message only if it doesn't contain a blacklisted term
+        if not contains_blacklisted(translated, channel_config["BLACKLISTED_TERMS"]):
+            # If the value of translate is None, the detected language is not valid
+            if translate is None:
+                print(f"{detected} is not a valid language to translate!")
+            else:
+                # Only send the translated message if it is NOT the same as the original message
+                # And if the user does NOT have a blacklisted role
+                if translated.lower() != message.content.lower() and not any(role.id in channel_config["BLACKLISTED_ROLES"] for role in message.author.roles):
+                    print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
+                    # Format the reply through another function, allowing customizability for each guild
+                    formatted_reply = format_reply(channel_config["TRANSLATE_REPLY_MESSAGE"], translated, message, detected)
+                    
+                    # If the config option "REPLY" is true, reply to the untranslated message, otherwise just send it in the channel
+                    if channel_config["REPLY"]:
+                        await message.reply(formatted_reply)
+                    else:
+                        await message.channel.send(formatted_reply)
+                    # Debugging stuff
+                    if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
     
     # Process commands
     # Apparently its useless, but I'm leaving it here anyway

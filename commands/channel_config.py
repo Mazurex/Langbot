@@ -64,7 +64,7 @@ class ChannelConfigPaginator(discord.ui.View):
     @discord.ui.button(label=">", style=discord.ButtonStyle.blurple)
     async def next_page(self, interaction:discord.Interaction, button=discord.ui.Button):
         """Go to the next page"""
-        if self.current_page < 0:
+        if self.current_page < self.total_pages - 1:
             self.current_page += 1
         else:
             self.current_page = 0

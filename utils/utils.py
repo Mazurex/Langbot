@@ -4,6 +4,7 @@ from googletrans import Translator, LANGUAGES, LANGCODES
 import re
 from deep_translator import GoogleTranslator
 from langdetect import detect, DetectorFactory
+from db.config_manager import update_guild_config
 
 translator = Translator()
 
@@ -80,7 +81,7 @@ def translate(text: str, target_lang: str = "en", source_lang: str = "auto"):
 
 def detect_lang(prompt: str):
     """A function to detect the language of a given prompt"""
-    DetectorFactory.seed(0)
+    # DetectorFactory.seed(0) TODO: Figure out why this even exists
     detected = detect(prompt)
     if detected is not None and detected != prompt:
         return detected
