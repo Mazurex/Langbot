@@ -28,7 +28,7 @@ This command allows users to secretly translate messages into any language.
 
 **How It Works:**
 
-1. The bot checks if the user specified a language, if they did, ensure it is valid, if the use doesn't specify a language, it will default to the guild's config target language.
+1. The bot checks if the user specified a language, if they did, ensure it is valid, if the user doesn't specify a language, it will default to the guild's config target language.
 2. Then the bot determines what language the `<prompt>` is in.
 3. It then translates the message using the `(language)` parameter.
 
@@ -40,11 +40,7 @@ Bot (Private Reply): [Polish ➜ English]
                      I am Polish
 ```
 
-![image](https://github.com/user-attachments/assets/c6647786-a7a6-4857-82b5-a9b8301cd8be)
-<<<<<<< HEAD
-=======
-
->>>>>>> 07f01caa702003f4da7216d0e8b5ad7c37a96524
+# ![image](https://github.com/user-attachments/assets/c6647786-a7a6-4857-82b5-a9b8301cd8be)
 
 ---
 
@@ -71,11 +67,7 @@ Fetches a list of **all** supported languages from the **googletrans** library, 
 /supported
 ```
 
-![image](https://github.com/user-attachments/assets/3d41c5da-0019-4e0b-9f98-60c0696d17c8)
-<<<<<<< HEAD
-=======
-
->>>>>>> 07f01caa702003f4da7216d0e8b5ad7c37a96524
+# ![image](https://github.com/user-attachments/assets/3d41c5da-0019-4e0b-9f98-60c0696d17c8)
 
 ---
 
@@ -167,6 +159,8 @@ On the set subcommand, all parameters, besides `channel` are optional, and if le
 
 ## Installation & Setup
 
+This bot is open-source, meaning you are able to clone this repository and play around with it yourself, however, under the laws of the **Prosperity Public License** agreements, you may **NOT** distribute, sublicense or publically share any part of this software without my written approval.
+
 1. **Clone the repository**
    ```sh
    git clone https://github.com/Mazurex/Langbot.git
@@ -202,10 +196,14 @@ Want to contribute? Follow these steps:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Prosperity Public License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
 - **Discord Server**: [Invite Link](https://discord.gg/AYmdn5UuwJ)
 - **GitHub Issues**: [Report Bugs](https://github.com/Mazurex/Langbot/issues)
 - **Email**: business.mazurex@gmail.com
+
+## Extra
+
+I personally hate getting paid for my personal projects, and I want to be transparent with whomever uses the things I make, hence all my public creations are open-source and available to everyone!

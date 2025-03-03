@@ -19,7 +19,7 @@ def cc_to_flag(country_code: str) -> str:
         "ky": "ru"
     }
     
-    # If there is a - in the code, it means its a BCP 47 language tag
+    # If there is a - in the code, it means its a BCP 47 language code
     # So we re-run this function, just getting the country code ending part (after the -)
     if "-" in country_code:
         return cc_to_flag(country_code.split("-")[1])
@@ -62,14 +62,8 @@ def replace_mentions(message: discord.Message, content: str) -> str:
         content = re.sub(f"<@!?{user.id}>", "[MENTION]", content)
     return content
 
-def cover_blacklisted_terms(message: str, blacklisted: iter) -> str:
-    """Replace all blacklisted terms with an empty string"""
-    for item in blacklisted:
-        if item in message:
-            message = message.replace(item, "")
-    return message
-
 def internal_print_log_message(interaction, command_name = "UNKNOWN") -> None:
+    """Function that prints on command usage"""
     print(f"{interaction.user.display_name} used the {command_name} command in {interaction.channel.name}/{interaction.guild.name}")
 
 def translate(text: str, target_lang: str = "en", source_lang: str = "auto"):
