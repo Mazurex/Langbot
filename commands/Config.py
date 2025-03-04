@@ -2,8 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from db.config_manager import get_guild_config, update_guild_config, reset_guild_config
-from googletrans import LANGUAGES
-from utils.utils import f_translation_reply_message, f_target_lang, f_ignore_langs, f_ignore_bots, f_blacklisted_terms, f_reply, f_blacklisted_roles
+from utils.utils import LANGUAGES, f_translation_reply_message, f_target_lang, f_ignore_langs, f_ignore_bots, f_blacklisted_terms, f_reply, f_blacklisted_roles
 
 # All customize commands here have an option value parameter
 # If no value is given, instead send an embed for what the command does

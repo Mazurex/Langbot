@@ -21,7 +21,7 @@ import discord
 from discord.ext import commands
 import asyncio
 
-from utils.utils import replace_mentions, cover_blacklisted_terms, translate, detect_lang, format_reply
+from utils.utils import replace_mentions, translate, detect_lang, format_reply
 import bot.settings as settings
 from db.database import get_database
 from db.config_manager import get_guild_config, get_channel_config
@@ -90,7 +90,7 @@ async def on_guild_join(guild: discord.Guild):
 @bot.event
 async def on_message(message: discord.Message):
     # Get the guild's config
-    config = await get_guild_config(message.guild.id)
+    config = await get_guild_config(message.guild.id) # TODO: unused (switched to channel configs which default to guild configs)
     channel_config = await get_channel_config(message.guild.id, message.channel.id)
     
     # Only ignore this message is the author is a bot, and ignore bots is enabled in the channel/global config

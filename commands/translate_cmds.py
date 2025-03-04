@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
-from googletrans import LANGUAGES
-from utils.utils import translate, detect, valid_code
+from utils.utils import translate, detect, valid_code, LANGUAGES
 import math
 
 from db.config_manager import get_guild_config, get_channel_config
