@@ -1,7 +1,12 @@
 import discord
 from discord.ext import commands
-from utils.utils import translate, detect, valid_code, LANGUAGES
+from utils.utils import valid_code
 import math
+
+# Custom made translation API
+from TranslationAPI.translate import translate
+from TranslationAPI.detect import detect
+from TranslationAPI.constants import LANGUAGES
 
 from db.config_manager import get_guild_config, get_channel_config
 
@@ -64,7 +69,7 @@ class TranslateCmds(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    # Create info about the command and its paramaters
+    # Create info about the command and its parameters
     @discord.app_commands.command(name="translate", description="Translate any text into any desired language")
     @discord.app_commands.describe(text="The text to translate")
     @discord.app_commands.describe(target="The target language to translate to, run /supported to view valid languages. Defaults to the guilds target language")

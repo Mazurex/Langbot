@@ -12,19 +12,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the absolute path of the project root
-projet_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 # Add it to sys.path
-sys.path.insert(0, projet_root)
+sys.path.insert(0, project_root)
 
 import discord
 from discord.ext import commands
 import asyncio
 
-from utils.utils import replace_mentions, translate, detect_lang, format_reply
-import bot.settings as settings
+from utils.utils import replace_mentions, format_reply
 from db.database import get_database
 from db.config_manager import get_guild_config, get_channel_config
+
+# Custom made translation API
+from TranslationAPI.translate import  translate
+from TranslationAPI.detect import detect
 
 db, config_collection = get_database()
 
@@ -83,38 +86,51 @@ async def load_cogs():
 @bot.event
 async def on_guild_join(guild: discord.Guild):
     print(f"Joined new guild: {guild.name} ({guild.id})")
-    
+
+    # Sleep for 1 second to prevent duplication in the database
+    # This sometimes gets called at the same time as on_message
+    # Which also creates a default config if there isn't one
+    # So this event is really an edge-case
+    await asyncio.sleep(1)
     # Generate a default config if the guild didn't already have one
     await get_guild_config(guild.id)
 
 @bot.event
+async def on_guild_leave(guild: discord.Guild):
+    print(f"Left guild: {guild.name} ({guild.id})")
+
+@bot.event
 async def on_message(message: discord.Message):
     # Get the guild's config
-    config = await get_guild_config(message.guild.id) # TODO: unused (switched to channel configs which default to guild configs)
     channel_config = await get_channel_config(message.guild.id, message.channel.id)
     
     # Only ignore this message is the author is a bot, and ignore bots is enabled in the channel/global config
-    if message.author.bot and channel_config["IGNORE_BOTS"] and message.author.id != "1341595906662993920":
+    if message.author.bot and channel_config["IGNORE_BOTS"] or message.author.id == bot.user.id:
         return
     
     # Detect what language the message is in
-    detected = detect_lang(message.content)
+    detected = detect(message.content)
     
-    # If there is a language detected, and its a language that is not in the "ignore languages" channel/global config
+    # If there is a language detected, and it's a language that is not in the "ignore languages" channel/global config
     if detected and detected not in channel_config["IGNORE_LANGS"]:
-        # Translate the message into the desired langage specified in the config
+        # Translate the message into the desired language specified in the config
         # Also replace all mentions with [MENTION]
-        translated = translate(replace_mentions(message, message.content), channel_config["TARGET_LANG"])
+        formatted = replace_mentions(message, message.content)
+        translated = translate(formatted, channel_config["TARGET_LANG"])
         
-        def contains_blacklisted(text: str, blacklisted_terms: list) -> bool:
+        def contains_blacklisted() -> bool:
             """A function that returns true if a given string contains a list of blacklisted terms, otherwise false"""
-            for word in text.split():
-                if word in blacklisted_terms:
+            for blacklisted in channel_config["BLACKLISTED_TERMS"]:
+                print(blacklisted)
+                if blacklisted in translated:
+                    return True
+                if blacklisted in formatted:
                     return True
             return False
 
+
         # Send the message only if it doesn't contain a blacklisted term
-        if not contains_blacklisted(translated, channel_config["BLACKLISTED_TERMS"]):
+        if not contains_blacklisted():
             # If the value of translate is None, the detected language is not valid
             if translate is None:
                 print(f"{detected} is not a valid language to translate!")
@@ -135,7 +151,7 @@ async def on_message(message: discord.Message):
                     if DEBUG_MODE: await message.channel.send(f"**[DEBUGGING]**\n```{detected}``````{translated}```")
     
     # Process commands
-    # Apparently its useless, but I'm leaving it here anyway
+    # Apparently it's useless, but I'm leaving it here anyway
     await bot.process_commands(message)
 
 async def main():

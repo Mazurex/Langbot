@@ -1,7 +1,9 @@
-discord.py
+discord.py~=2.5.2
 googletrans==4.0.2
-python-dotenv
-asyncio
+python-dotenv~=1.0.1
+asyncio~=3.4.3
 pymongo[srv]
-deep-translator
-langdetect
+deep-translator~=1.11.4
+langdetect~=1.0.9
+requests~=2.32.3
+motor
