@@ -144,7 +144,8 @@ async def on_message(message: discord.Message):
                     # Format the reply through another function, allowing customizability for each guild
                     formatted_reply = format_reply(channel_config["TRANSLATE_REPLY_MESSAGE"], translated, message, detected)
                     
-                    # If the config option "REPLY" is true, reply to the untranslated message, otherwise just send it in the channel
+                    # If the config option "REPLY" is true, reply to the untranslated message, otherwise send it
+                    # in the channel
                     if channel_config["REPLY"]:
                         await message.reply(formatted_reply)
                     else:
