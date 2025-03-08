@@ -111,7 +111,7 @@ class TranslateCmds(commands.Cog):
         
         # Create an instance of the paginator
         view = LanguagePaginator(user=interaction.user, languages=LANGUAGES)
-        # Embed for each individual page
+        # Embed for each page
         embed = view.format_page()
         
         await interaction.followup.send(embed=embed, view=view, ephemeral=True)

@@ -6,34 +6,46 @@ import re
 from db.config_manager import update_guild_config
 
 # Custom made translation API
-from TranslationAPI.constants import LANGUAGES
+from TranslationAPI.constants import LANGUAGES, FLAGS
 from TranslationAPI.translate import translate
 from TranslationAPI.detect import detect
 
+
+# TODO: Completely changed up the flag system, now we use custom flags
 def cc_to_flag(country_code: str) -> str:
     """Convert a country code into its flag variant"""
-    # Some country codes (such as japanese, are different for discord emojis (ja in discord is jp))
-    # To fix this, we replace these codes with custom set ones
-    code_replacements = {
-        "ja": "jp",
-        "en": "gb",
-        "ar": "iq",
-        "ky": "ru",
-        "sl": "pl"
-    }
-    
-    # If there is a - in the code, it means it's a BCP 47 language code
-    # So we re-run this function, just getting the country code ending part (after the -)
-    if "-" in country_code:
-        return cc_to_flag(country_code.split("-")[1])
 
-    # If the country code is in the above code_replacements
-    # Then set the value to the one adjacent to the code replacements
-    country_code = code_replacements.get(country_code, country_code)
-    
-    if len(country_code) == 2:
-        return "".join(chr(127397 + ord(c)) for c in country_code.upper())
-    return settings.DEFAULT_INVALID_COUNTRY_CODE_ICON
+    if country_code in LANGUAGES.keys():
+        return FLAGS.get(country_code)
+    else:
+        return "🌍"
+
+
+    # # Some country codes (such as japanese, are different for discord emojis (ja in discord is jp))
+    # # To fix this, we replace these codes with custom set ones
+    # code_replacements = {
+    #     "ja": "jp",
+    #     "en": "gb",
+    #     "ar": "iq",
+    #     "ky": "ru",
+    #     "sl": "pl",
+    #     "ko": "kr",
+    #     "sr": "ru",
+    #     "hr": "ru"
+    # }
+    #
+    # # If there is a - in the code, it means it's a BCP 47 language code,
+    # # So we re-run this function, just getting the country code ending part (after the -)
+    # if "-" in country_code:
+    #     return cc_to_flag(country_code.split("-")[1])
+    #
+    # # If the country code is in the above code_replacements,
+    # # Then set the value to the one adjacent to the code replacements
+    # country_code = code_replacements.get(country_code, country_code)
+    #
+    # if len(country_code) == 2:
+    #     return "".join(chr(127397 + ord(c)) for c in country_code.upper())
+    # return settings.DEFAULT_INVALID_COUNTRY_CODE_ICON
 
 def format_reply(reply_text: str,
                 translated_text: str,
@@ -41,7 +53,7 @@ def format_reply(reply_text: str,
                 detected_lang: str) -> str:
     """Function that formats a message based on given parameters and placeholders"""
     return reply_text.format(
-            flag = cc_to_flag(detected_lang),
+            flag = FLAGS.get(detected_lang),
             translated = translated_text,
             original = message.content,
             author_id = message.author.id,
@@ -147,17 +159,16 @@ async def f_reply(value: str, interaction: discord.Interaction, supress: bool = 
     return value
 
 async def f_blacklisted_roles(value: str, interaction: discord.Interaction, supress: bool = False):
-    if value == "*":
+    if "nothing" in value:
         valid_role_ids = []
     else:
         # Use regex to get all role ids from the message
         role_ids = re.findall(r"<@&(\d+)>", value)
 
         valid_role_ids = [int(role_id) for role_id in role_ids if interaction.guild.get_role(int(role_id))]
-        
+
         if len(valid_role_ids) == 0:
-            return False
-    
+            return False, None
     await update_guild_config(interaction.guild_id, "BLACKLISTED_ROLES", valid_role_ids)
     if supress is False: internal_print_log_message(interaction, "config/blacklisted-roles")
     return True, valid_role_ids

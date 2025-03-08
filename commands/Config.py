@@ -36,7 +36,7 @@ class Config(commands.Cog):
     async def view(self, interaction: discord.Interaction):
         """View all configurations as an embed"""
         await interaction.response.defer(ephemeral=True)
-        # Get the guilds config
+        # Get the guild config
         db_config = await get_guild_config(interaction.guild_id)
         
         # Description of the embed
@@ -155,10 +155,10 @@ class Config(commands.Cog):
     ):
         # Defer the reply
         await interaction.response.defer(ephemeral=True)
-        
+
         if value is None:
             config = await get_guild_config(interaction.guild_id)
-            
+
             description = f"""Current value: `{", ".join(LANGUAGES[i].capitalize() for i in config["IGNORE_LANGS"])}`
             The language(s) that the bot should ignore.
             Separate languages with commas (,).
@@ -170,15 +170,15 @@ class Config(commands.Cog):
             embed = discord.Embed(
                 title="Ignore Languages",
                 description=description,
-                color=discord.Color.blue
-                
+                color=discord.Color.blue()
             )
             
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
 
         # External function
         value = await f_ignore_langs(value, interaction)
-        # Send confirmation message
+        # Send a confirmation message
         await interaction.followup.send(f'Successfully update "Ignore Languaes" to `{", ".join(value)}`', ephemeral=True)
     
     async def ignore_bots(
@@ -270,9 +270,10 @@ class Config(commands.Cog):
         if value is None:
             # Get the config of the guild
             config = await get_guild_config(interaction.guild_id)
-            description = f"""Current value: `{", ".join(config["BLACKLISTED_ROLES"]) if len(config["BLACKLISTED_ROLES"]) > 0 else "nothing"}`
+            description = f"""Current value: `{", ".join(map(str, config["BLACKLISTED_ROLES"])) if len(config["BLACKLISTED_ROLES"]) > 0 else "nothing"}`
             If a user has any of these roles, the bot will not translate their messages.
-            You can enter role mentions, everything else will be ignored."""
+            You can enter role mentions, everything else will be ignored.
+            To set nothing, include \"nothing\" in the input."""
             # The embed to reply with
             embed = discord.Embed(
                 title="Blacklisted Roles",
@@ -280,7 +281,8 @@ class Config(commands.Cog):
                 color=discord.Color.blue()
             )
             
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
         result, value = await f_blacklisted_roles(value, interaction)
 
         if result is False:

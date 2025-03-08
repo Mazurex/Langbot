@@ -107,9 +107,9 @@ Allows the configuration of the bot in the guild, such as translation reply form
 4. `/config target-language (value)` - Change the language that the bot will translate messages into when replying, must be a valid language (check `/supported`).
 5. `/config ignore-languages (value)` - A list of languages to ignore, separated by commas (for example: `en, de, fr`).
 6. `/config ignore-bots (value)` - A true or false statement, if `false` the bot will translate messages from other bots (if their languages are not in the ignored list).
-7. `/config blacklisted-terms (value)` - A list of words that are not allowed to be translated, if the translated message contains one of these, it will not be sent.
+7. `/config blacklisted-terms (value)` - A list of words that are not allowed to be translated, if the translated message contains one of these, it will not be translated.
 8. `/config reply (value)` - A true of false statement, if `false` the bot will send the message in the channel, otherwise it will reply to the untranslated message.
-9. `/config blacklisted-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "\*" to disable this.
+9. `/config blacklisted-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
 
 **Usage:**
 
@@ -213,6 +213,8 @@ This project is licensed under the Prosperity Public License - see the [LICENSE]
 - **GitHub Issues**: [Report Bugs](https://github.com/Mazurex/Langbot/issues)
 - **Email**: business.mazurex@gmail.com
 
-## Extra
-
-I personally hate getting paid for my personal projects, and I want to be transparent with whomever uses the things I make, hence all my public creations are open-source and available to everyone!
+## Credits
+- [Mazurex](https://www.youtube.com/channel/UCQgCmVILYg6AfsohPTxrQPg) - Developer, Tester
+- [Azy Supreme](https://www.youtube.com/channel/UCPQGu1pokNERNJVZkZdl7-A) - Tester
+- [CodingCat](https://codingcat24.dev/) - Tester
+- [Random_Chad](https://www.youtube.com/channel/UCrklm_XIl8yd7LU-xB4dIIg) - Tester

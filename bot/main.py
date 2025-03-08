@@ -1,7 +1,7 @@
 ###################################################
 ##                                               ##
 ##       For the newest version of the bot       ##
-##     We use deep-translate for translation     ##
+##        We have made custom translation        ##
 ##           Instead of googletrans              ##
 ##                                               ##
 ###################################################
@@ -28,6 +28,7 @@ from db.config_manager import get_guild_config, get_channel_config
 # Custom made translation API
 from TranslationAPI.translate import  translate
 from TranslationAPI.detect import detect
+from TranslationAPI.constants import FLAGS
 
 db, config_collection = get_database()
 
@@ -89,7 +90,7 @@ async def on_guild_join(guild: discord.Guild):
 
     # Sleep for 1 second to prevent duplication in the database
     # This sometimes gets called at the same time as on_message
-    # Which also creates a default config if there isn't one
+    # Which also creates a default config if there isn't one,
     # So this event is really an edge-case
     await asyncio.sleep(1)
     # Generate a default config if the guild didn't already have one
@@ -119,23 +120,24 @@ async def on_message(message: discord.Message):
         translated = translate(formatted, channel_config["TARGET_LANG"])
         
         def contains_blacklisted() -> bool:
-            """A function that returns true if a given string contains a list of blacklisted terms, otherwise false"""
+            """A function
+            that returns true
+            if a given string is equal to an item in a list of blacklisted terms otherwise false"""
             for blacklisted in channel_config["BLACKLISTED_TERMS"]:
-                print(blacklisted)
-                if blacklisted in translated:
+                if blacklisted == translated:
                     return True
-                if blacklisted in formatted:
+                if blacklisted == formatted:
                     return True
             return False
 
 
         # Send the message only if it doesn't contain a blacklisted term
         if not contains_blacklisted():
-            # If the value of translate is None, the detected language is not valid
+            # If the value of translation is None, the detected language is not valid
             if translate is None:
                 print(f"{detected} is not a valid language to translate!")
             else:
-                # Only send the translated message if it is NOT the same as the original message
+                # Only send the translated message if it is different from the original message,
                 # And if the user does NOT have a blacklisted role
                 if translated.lower() != message.content.lower() and not any(role.id in channel_config["BLACKLISTED_ROLES"] for role in message.author.roles):
                     print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
