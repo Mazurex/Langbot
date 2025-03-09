@@ -2,6 +2,5 @@ discord.py~=2.5.2
 python-dotenv~=1.0.1
 asyncio~=3.4.3
 pymongo[srv]
-deep-translator~=1.11.4
 requests~=2.32.3
 motor
