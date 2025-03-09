@@ -35,7 +35,7 @@ db, config_collection = get_database()
 print(f"Database {db.name} loaded successfully!")
 print(f"Collection {config_collection.name} loaded successfully!")
 # Debugging mode (DEV)
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # Setup the discord bot environment
 intents = discord.Intents.default()
