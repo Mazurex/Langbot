@@ -118,6 +118,7 @@ class Channel_config(commands.Cog):
     @app_commands.describe(blacklisted_terms="Terms that the bot will remove from a message, separate with commas")
     @app_commands.describe(reply="Should the bot reply to the untranslated message")
     @app_commands.describe(blacklisted_roles="Any members with these roles will be ignored by the bot, type * to disable")
+    @app_commands.describe(auto_translate="Should the bot automatically translate messages")
     async def set(
         self, interaction: discord.Interaction,
         channel: discord.TextChannel,
@@ -127,23 +128,39 @@ class Channel_config(commands.Cog):
         ignore_bots: bool = None,
         blacklisted_terms: str = None,
         reply: bool = None,
-        blacklisted_roles: str = None
+        blacklisted_roles: str = None,
+        auto_translate: bool = None
     ):
         await interaction.response.defer(ephemeral=True)
         
         channel_config = await set_channel_config(interaction.guild_id, channel.id,
                                 translate_reply_message, target_language,
                                 ignore_languages, ignore_bots,
-                                blacklisted_terms, reply, blacklisted_roles)
-        
+                                blacklisted_terms, reply,
+                                blacklisted_roles, auto_translate)
+
+        ignored_languages_str = "none"
+        if len(channel_config["IGNORED_LANGS"]) > 0:
+            ignored_languages_str = ", ".join(channel_config["IGNORE_LANGS"])
+
+        blacklisted_terms_str = "none"
+        if len(channel_config["BLACKLISTED_TERMS"]) > 0:
+            blacklisted_terms_str = ", ".join(channel_config["BLACKLISTED_TERMS"])
+
+        blacklisted_roles_str = "none"
+        if len(channel_config["BLACKLISTED_ROLES"]) > 0:
+            blacklisted_roles_str = ", ".join([f"<@&{role_id}>" for role_id in channel_config["BLACKLISTED_ROLES"]])
+
+
         description = f"""Successfully set a channel config for <#{channel.id}>.
         Translation reply message: `{channel_config["TRANSLATE_REPLY_MESSAGE"]}`
         Target Language: `{channel_config["TARGET_LANG"]}`
-        Ignored Languages: `{", ".join(channel_config["IGNORE_LANGS"])}`
+        Ignored Languages: `{ignored_languages_str}`
         Ignore Bots: `{"Yes" if channel_config["IGNORE_BOTS"] else "No"}`
-        Blacklisted Terms: `{", ".join(channel_config["BLACKLISTED_TERMS"])}`
+        Ignored Terms: `{blacklisted_terms_str}`
         Reply: `{"Yes" if channel_config["REPLY"] else "No"}`
-        Blacklisted Roles: {", ".join([f"<@&{role_id}>" for role_id in channel_config["BLACKLISTED_ROLES"]])}"""
+        Blacklisted Roles: `{blacklisted_roles_str}`
+        Auto Translate: `{auto_translate}`"""
         
         await interaction.followup.send(description, ephemeral=True)
         internal_print_log_message(interaction, "channel-config/set")
@@ -159,7 +176,8 @@ class Channel_config(commands.Cog):
         
         if not removed:
             return await interaction.followup.send(f"<#{channel.id}> does not have a channel config to remove!", ephemeral=True)
-        await interaction.followup.send(f"Successfully deleted the channel config for <#{channel.id}>")
+        else:
+            await interaction.followup.send(f"Successfully deleted the channel config for <#{channel.id}>")
         print(f"{interaction.user.display_name} used the channel-config/remove command in {interaction.channel.name}/{interaction.guild.name}")
         internal_print_log_message(interaction, "channel-config/remove")
     

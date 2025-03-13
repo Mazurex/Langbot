@@ -106,7 +106,15 @@ async def on_message(message: discord.Message):
     channel_config = await get_channel_config(message.guild.id, message.channel.id)
     
     # Only ignore this message is the author is a bot, and ignore bots is enabled in the channel/global config
-    if message.author.bot and channel_config["IGNORE_BOTS"] or message.author.id == bot.user.id:
+    if message.author.bot and channel_config["IGNORE_BOTS"]:
+        return
+    
+    # Bot cannot translate its own messages
+    if message.author.id == bot.user.id:
+        return
+    
+    # If the channel is set to not automaticallty translate, return
+    if not channel_config["AUTO_TRANSLATE"]:
         return
     
     # Detect what language the message is in
@@ -119,20 +127,18 @@ async def on_message(message: discord.Message):
         formatted = replace_mentions(message, message.content)
         translated = translate(formatted, channel_config["TARGET_LANG"])
         
-        def contains_blacklisted() -> bool:
+        def contains_ignored() -> bool:
             """A function
             that returns true
-            if a given string is equal to an item in a list of blacklisted terms otherwise false"""
-            for blacklisted in channel_config["BLACKLISTED_TERMS"]:
-                if blacklisted == translated:
-                    return True
-                if blacklisted == formatted:
+            if a given string is equal to an item in a list of ignored terms otherwise false"""
+            for ignored in channel_config["IGNORED_TERMS"]:
+                if ignored == translated or ignored == formatted:
                     return True
             return False
 
 
-        # Send the message only if it doesn't contain a blacklisted term
-        if not contains_blacklisted():
+        # Send the message only if it doesn't contain a ignored term
+        if not contains_ignored():
             # If the value of translation is None, the detected language is not valid
             if translate is None:
                 print(f"{detected} is not a valid language to translate!")

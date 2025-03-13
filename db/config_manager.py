@@ -12,10 +12,11 @@ def default_cfig(guild_id: str | None = None, remove_channel_config: bool = Fals
         "TARGET_LANG": settings.DEFAULT_TARGET_LANG,
         "IGNORE_LANGS": settings.DEFAULT_IGNORE_LANGS,
         "IGNORE_BOTS": settings.DEFAULT_IGNORE_BOTS,
-        "BLACKLISTED_TERMS": settings.DEFAULT_BLACKLISTED_TERMS,
+        "IGNORED_TERMS": settings.DEFAULT_IGNORED_TERMS,
         "REPLY": settings.DEFAULT_REPLY,
         "BLACKLISTED_ROLES": settings.DEFAULT_BLACKLISTED_ROLES,
         "CHANNEL_CONFIG": settings.DEFAULT_CHANNEL_CONFIG,
+        "AUTO_TRANSLATE": settings.DEFAULT_AUTO_TRANSLATE
     }
     
     if remove_channel_config:
@@ -72,7 +73,8 @@ async def set_channel_config(
     ignore_bots: bool = None,
     reply: bool = None,
     blacklisted_roles: list = None,
-    blacklisted_terms: list = None
+    ignored_terms: list = None,
+    auto_translate: bool = None
 ) -> dict:
     """Creates/Updates a channel specfic config"""
     try:
@@ -87,18 +89,20 @@ async def set_channel_config(
         if target_lang is None: target_lang = config.get("TARGET_LANG")
         if ignore_langs is None: ignore_langs = config.get("IGNORE_LANGS")
         if ignore_bots is None: ignore_bots = config.get("IGNORE_BOTS")
-        if blacklisted_terms is None: blacklisted_terms = config.get("BLACKLISTED_TERMS")
+        if ignored_terms is None: blacklisted_terms = config.get("IGNORED_TERMS")
         if reply is None: reply = config.get("REPLY")
         if blacklisted_roles is None: blacklisted_roles = config.get("BLACKLISTED_ROLES")
+        if auto_translate is None: auto_translate = config.get("AUTO_TRANSLATE")
         
         new_config = {
             "TRANSLATE_REPLY_MESSAGE": translate_reply_message,
             "TARGET_LANG": target_lang,
             "IGNORE_LANGS": ignore_langs,
             "IGNORE_BOTS": ignore_bots,
-            "BLACKLISTED_TERMS": blacklisted_terms,
+            "IGNORED_TERMS": blacklisted_terms,
             "REPLY": reply,
-            "BLACKLISTED_ROLES": blacklisted_roles
+            "BLACKLISTED_ROLES": blacklisted_roles,
+            "AUTO_TRANSLATE": auto_translate
         }
         
         channel_config[str(channel_id)] = new_config
