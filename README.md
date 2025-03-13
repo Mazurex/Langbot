@@ -111,12 +111,9 @@ Allows the configuration of the bot in the guild, such as translation reply form
 6. `/config ignore-bots (value)` - A true or false statement, if `false` the bot will translate messages from other bots (if their languages are not in the ignored list).
 7. `/config ignored-terms (value)` - A list of words that are not allowed to be translated, if the translated message contains one of these, it will not be translated. Only enter "nothing" to disable this.
 8. `/config reply (value)` - A true of false statement, if `false` the bot will send the message in the channel, otherwise it will reply to the untranslated message.
-<<<<<<< HEAD
-9. `/config ignored-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
-=======
-9. `/config blacklisted-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
->>>>>>> 2c892d7f01daebc55f49bc4fe5d3b1ec13f557a8
-10. `/config auto-translate (value)` - If false the bot will ignore any message, regardless of the language its spoken in.
+9. # `/config ignored-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
+10. `/config blacklisted-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
+11. `/config auto-translate (value)` - If false the bot will ignore any message, regardless of the language its spoken in.
 
 **Usage:**
 
@@ -129,11 +126,9 @@ Allows the configuration of the bot in the guild, such as translation reply form
 /config ignore-bots true
 /config ignored-terms hello, world
 /config reply false
-<<<<<<< HEAD
 /config ignored-roles @owner @coolguy
 =======
 /config blacklisted-roles @owner @coolguy
->>>>>>> 2c892d7f01daebc55f49bc4fe5d3b1ec13f557a8
 /config auto-translate true
 ```
 
@@ -145,12 +140,9 @@ Allows the configuration of the bot in the guild, such as translation reply form
 4. Ignore Bots: `true`
 5. Ignored Terms: `"lmaoo", "wdym", "ik", "ik lol"`
 6. Reply: `true`
-<<<<<<< HEAD
-7. Ignored Roles: `none`
-=======
-7. Blacklisted Roles: `none`
->>>>>>> 2c892d7f01daebc55f49bc4fe5d3b1ec13f557a8
-8. Auto Translate: `true`
+7. # Ignored Roles: `none`
+8. Blacklisted Roles: `none`
+9. Auto Translate: `true`
 
 ![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
 
