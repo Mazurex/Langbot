@@ -20,33 +20,6 @@ def cc_to_flag(country_code: str) -> str:
     else:
         return "🌍"
 
-
-    # # Some country codes (such as japanese, are different for discord emojis (ja in discord is jp))
-    # # To fix this, we replace these codes with custom set ones
-    # code_replacements = {
-    #     "ja": "jp",
-    #     "en": "gb",
-    #     "ar": "iq",
-    #     "ky": "ru",
-    #     "sl": "pl",
-    #     "ko": "kr",
-    #     "sr": "ru",
-    #     "hr": "ru"
-    # }
-    #
-    # # If there is a - in the code, it means it's a BCP 47 language code,
-    # # So we re-run this function, just getting the country code ending part (after the -)
-    # if "-" in country_code:
-    #     return cc_to_flag(country_code.split("-")[1])
-    #
-    # # If the country code is in the above code_replacements,
-    # # Then set the value to the one adjacent to the code replacements
-    # country_code = code_replacements.get(country_code, country_code)
-    #
-    # if len(country_code) == 2:
-    #     return "".join(chr(127397 + ord(c)) for c in country_code.upper())
-    # return settings.DEFAULT_INVALID_COUNTRY_CODE_ICON
-
 def format_reply(reply_text: str,
                 translated_text: str,
                 message: discord.Message,
@@ -115,22 +88,28 @@ async def f_target_lang(value: str, interaction: discord.Interaction, supress: b
 
 async def f_ignore_langs(value: str, interaction: discord.Interaction, supress: bool = False) -> list:
     # Make the value lowercase, stripped, and replacing any spaces with empty characters 
-    value = value.lower().strip().replace(" ", "")
-    
-    # If there are multiple languages specified
-    if "," in value:
-        # Convert the value into a list, separating each item by a comma
-        value = value.split(",")
+    print("called")
+    if value == "nothing":
+        value = []
+        print("nothing")
     else:
-        # Only one item in the list, still convert it into a list
-        value = [value]
-    
-    # Loop through the new value list
-    for i, item in enumerate(value):
-        is_valid, code = valid_code(item)
-        if not is_valid:
-            return await interaction.followup.send(f"`{item}` is not a valid language code or name", ephemeral=True)
-        value[i] = code
+        print("something")
+        value = value.lower().strip().replace(" ", "")
+        
+        # If there are multiple languages specified
+        if "," in value:
+            # Convert the value into a list, separating each item by a comma
+            value = value.split(",")
+        else:
+            # Only one item in the list, still convert it into a list
+            value = [value]
+        
+        # Loop through the new value list
+        for i, item in enumerate(value):
+            is_valid, code = valid_code(item)
+            if not is_valid:
+                return await interaction.followup.send(f"`{item}` is not a valid language code or name", ephemeral=True)
+            value[i] = code
 
     if supress is False: internal_print_log_message(interaction, "config/ignore-languages")
     
@@ -143,14 +122,17 @@ async def f_ignore_bots(value: bool, interaction: discord.Interaction, supress: 
     if supress is False: internal_print_log_message(interaction, "config/ignore-bots")
     return value
 
-async def f_blacklisted_terms(value: str, interaction: discord.Interaction, supress: bool = False) -> list:
-    value = value.strip().replace(" ", "")
-    if "," in value:
-        value = value.split(",")
+async def f_ignored_terms(value: str, interaction: discord.Interaction, supress: bool = False) -> list:
+    if value == "nothing":
+        value = []
     else:
-        value = [value]
-    await update_guild_config(interaction.guild_id, "BLACKLISTED_TERMS", value)
-    if supress is False: internal_print_log_message(interaction, "config/blacklisted-terms")
+        value = value.strip()
+        if "," in value:
+            value = value.split(",")
+        else:
+            value = [value]
+    await update_guild_config(interaction.guild_id, "IGNORED_TERMS", value)
+    if supress is False: internal_print_log_message(interaction, "config/ignored-terms")
     return value
 
 async def f_reply(value: str, interaction: discord.Interaction, supress: bool = False):
@@ -159,7 +141,7 @@ async def f_reply(value: str, interaction: discord.Interaction, supress: bool = 
     return value
 
 async def f_blacklisted_roles(value: str, interaction: discord.Interaction, supress: bool = False):
-    if "nothing" in value:
+    if value == "nothing":
         valid_role_ids = []
     else:
         # Use regex to get all role ids from the message
@@ -172,3 +154,8 @@ async def f_blacklisted_roles(value: str, interaction: discord.Interaction, supr
     await update_guild_config(interaction.guild_id, "BLACKLISTED_ROLES", valid_role_ids)
     if supress is False: internal_print_log_message(interaction, "config/blacklisted-roles")
     return True, valid_role_ids
+
+async def f_auto_translate(value: str, interaction: discord.Interaction, supress: bool = False):
+    await update_guild_config(interaction.guild_id, "AUTO_TRANSLATE", value)
+    if supress is False: internal_print_log_message(interaction, "config/auto-translate")
+    return value

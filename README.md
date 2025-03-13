@@ -3,9 +3,11 @@
 A powerful and open source Discord bot, **LangBot** is aimed at stopping the language barrier we experience in large Discord servers, members may want to speak other languages, however they are not allowed to, as it's hard for moderators to... moderate. So I came up with a Discord bot, that instantly replies to a message with a translation and language of origin. Want to translate something secretly? Well you can with the `/translate <prompt> (language)` command, where you enter a prompt in **any** language, and the bot will translate it for you into your desired language (**en** by default), where only you can see it!
 
 ## Guild Setup
+
 Adding **LangBot** to your guild is very straightforward, as the bot is very plug-and-play, with all configs preset with default values.
+
 1. [Invite](https://discord.com/oauth2/authorize?client_id=1341595906662993920&permissions=3072&integration_type=0&scope=bot+applications.commands) the bot to your server.
-2. The bot needs very few permissions, just "Send Messages" and "View Channels".
+2. The bot needs very few permissions, "Send Messages" and "View Channels."
 3. If you would like to customize your config, look at the [Admin Commands](#admin-commands) section.
 4. And you're done!
 
@@ -64,7 +66,7 @@ Fetches a list of **all** supported languages from a custom dictionary, and plac
 
 **How It Works:**
 
-1. The bot gets a Python dictionary of all supported languages from the **googletrans** library.
+1. The bot gets a Python dictionary of all supported languages from a custom dictionary.
 2. Then the bot paginates these languages (as there are over 300) into 30 languages per page.
 3. It then sends an embed with buttons to travel through the pages.
 
@@ -105,11 +107,12 @@ Allows the configuration of the bot in the guild, such as translation reply form
    15. `{lang_code}` - The language code of the untranslated message (for example: `en`).
    16. `{lang_name}` - The language name of the untranslated message (for example: `English`).
 4. `/config target-language (value)` - Change the language that the bot will translate messages into when replying, must be a valid language (check `/supported`).
-5. `/config ignore-languages (value)` - A list of languages to ignore, separated by commas (for example: `en, de, fr`).
+5. `/config ignore-languages (value)` - A list of languages to ignore, separated by commas (for example: `en, de, fr`). Only enter "nothing" to disable this.
 6. `/config ignore-bots (value)` - A true or false statement, if `false` the bot will translate messages from other bots (if their languages are not in the ignored list).
-7. `/config blacklisted-terms (value)` - A list of words that are not allowed to be translated, if the translated message contains one of these, it will not be translated.
+7. `/config ignored-terms (value)` - A list of words that are not allowed to be translated, if the translated message contains one of these, it will not be translated. Only enter "nothing" to disable this.
 8. `/config reply (value)` - A true of false statement, if `false` the bot will send the message in the channel, otherwise it will reply to the untranslated message.
-9. `/config blacklisted-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
+9. `/config ignored-roles (value)` - A list of @mentions, if a user has any of these mentions, they will be blocked by automatic translation. Only enter "nothing" to disable this.
+10. `/config auto-translate (value)` - If false the bot will ignore any message, regardless of the language its spoken in.
 
 **Usage:**
 
@@ -120,9 +123,10 @@ Allows the configuration of the bot in the guild, such as translation reply form
 /config target-language en
 /config ignore-languages en, fr, de
 /config ignore-bots true
-/config blacklisted-terms hello, world
+/config ignored-terms hello, world
 /config reply false
-/config blacklisted_roles @owner @coolguy
+/config ignored-roles @owner @coolguy
+/config auto-translate true
 ```
 
 **Default Values:**
@@ -131,9 +135,10 @@ Allows the configuration of the bot in the guild, such as translation reply form
 2. Target Language: `en`
 3. Ignore Languages: `en`
 4. Ignore Bots: `true`
-5. Blacklisted Terms: `"lmaoo", "wdym", "ik"`
+5. Ignored Terms: `"lmaoo", "wdym", "ik", "ik lol"`
 6. Reply: `true`
-7. Blacklisted Roles: `none`
+7. Ignored Roles: `none`
+8. Auto Translate: `true`
 
 ![image](https://github.com/user-attachments/assets/c1a3fe5c-d7fa-484d-9e30-55e9a6d5fce1)
 
@@ -205,7 +210,7 @@ Want to contribute? Follow these steps:
 
 ## License
 
-This project is licensed under the Prosperity Public License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Prosperity Public License—see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
@@ -214,7 +219,8 @@ This project is licensed under the Prosperity Public License - see the [LICENSE]
 - **Email**: business.mazurex@gmail.com
 
 ## Credits
+
 - [Mazurex](https://www.youtube.com/channel/UCQgCmVILYg6AfsohPTxrQPg) - Developer, Tester
 - [Azy Supreme](https://www.youtube.com/channel/UCPQGu1pokNERNJVZkZdl7-A) - Tester
-- [CodingCat](https://codingcat24.dev/) - Tester
-- [Random_Chad](https://www.youtube.com/channel/UCrklm_XIl8yd7LU-xB4dIIg) - Tester
+- [codingcat](https://codingcat24.dev/) - Tester
+- [Random_Chad](https://store.basement.host/) - Tester
