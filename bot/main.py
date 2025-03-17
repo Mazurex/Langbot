@@ -119,7 +119,7 @@ async def on_message(message: discord.Message):
         return
     
     # Detect what language the message is in
-    detected = detect(message.content)
+    detected = detect(message.content).lower()
     
     # If there is a language detected, and it's a language that is not in the "ignore languages" channel/global config
     if detected and detected not in channel_config["IGNORE_LANGS"]:
