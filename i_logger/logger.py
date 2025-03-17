@@ -21,6 +21,9 @@ def log(log_content: str, log_type: Literal["critical", "command", "generic"] = 
         file_to_open = "command.log"
         file_header_message = "All COMMAND logs, any command use will be logged here!\n\n"
     
+    print(file_to_open)
+    print(file_header_message)
+    
     # If the logs folder doesn't exist, create it
     os.makedirs("logs", exist_ok=True)
     
@@ -30,9 +33,9 @@ def log(log_content: str, log_type: Literal["critical", "command", "generic"] = 
             file_header_message = ""
     except FileNotFoundError:
         pass
-    
+
     # Open the specific log file
-    with open("logs/" + file_to_open, "a") as file:
+    with open("logs/" + file_to_open, "a", encoding="utf-8") as file:
         # Write the header message
         file.write(file_header_message)
         # Write the log
