@@ -43,7 +43,7 @@ def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"]
         # Get the translated text
         translated_text = " ".join(item[0] for item in response.json()[0] if item[0])
 
-        return translated_text
+        return translated_text, response.json()[2].lower()
     except:
         # Error: Return the original source message
         return source

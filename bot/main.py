@@ -29,7 +29,6 @@ from i_logger.logger import log
 
 # Custom made translation API
 from TranslationAPI.translate import  translate
-from TranslationAPI.detect import detect
 
 db, config_collection = get_database()
 
@@ -117,19 +116,14 @@ async def on_message(message: discord.Message):
     # If the channel is set to not automaticallty translate, return
     if not channel_config["AUTO_TRANSLATE"]:
         return
-    
-    # Detect what language the message is in
-    detected = detect(message.content).lower()
+
+    # Translate the message into the desired language specified in the config
+    # Also replace all mentions with [MENTION]
+    formatted = replace_mentions(message, message.content)
+    translated, detected = translate(formatted, channel_config["TARGET_LANG"])
     
     # If there is a language detected, and it's a language that is not in the "ignore languages" channel/global config
     if detected and detected not in channel_config["IGNORE_LANGS"]:
-        # Translate the message into the desired language specified in the config
-        # Also replace all mentions with [MENTION]
-        formatted = replace_mentions(message, message.content)
-        translated = translate(formatted, channel_config["TARGET_LANG"])
-        # Translate the message until it is fully in the target language (ensures multilanguage messages get translated properly)
-        while detect(translate) != channel_config["TARGET_LANG"]:
-            translated = translate(formatted, channel_config["TARGET_LANG"])
         
         def contains_ignored() -> bool:
             """A function

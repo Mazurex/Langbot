@@ -6,7 +6,6 @@ import math
 
 # Custom made translation API
 from TranslationAPI.translate import translate
-from TranslationAPI.detect import detect
 from TranslationAPI.constants import LANGUAGES
 
 from db.config_manager import get_guild_config, get_channel_config
@@ -92,8 +91,7 @@ class TranslateCmds(commands.Cog):
 
         try:
             # Translate the text into the target language, as well as detect what language the original message was in
-            translated = translate(text, target_lang=target)
-            lang_from = detect(text)
+            translated, lang_from = translate(text, target_lang=target)
             
             # Create the response for the message, showing what language its translating from and to
             response = f"**[{LANGUAGES[lang_from].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated}"
