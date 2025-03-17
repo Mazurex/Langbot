@@ -1,6 +1,7 @@
 from bot import settings
 
 from db.database import get_database
+from i_logger.logger import log
 
 # Get the database information from another function
 db, config_collection = get_database()
@@ -41,7 +42,7 @@ async def get_guild_config(guild_id: int) -> dict:
             return config
         return config
     except Exception as e:
-        print(f"Error with getting a guilds config: {e}")
+        log(f"Error with getting a guilds config: {e}", "critical")
 
 
 async def update_guild_config(guild_id: int, key: str, value) -> None:
@@ -52,7 +53,7 @@ async def update_guild_config(guild_id: int, key: str, value) -> None:
             {"$set": {key: value}}
         )
     except Exception as e:
-        print(f"Error when trying to update a guild config parameter: {e}")
+        log(f"Error when trying to update a guild config parameter: {e}", "critical")
 
 async def reset_guild_config(guild_id: int) -> None:
     """Resets the guild's config to the default values"""
@@ -62,7 +63,7 @@ async def reset_guild_config(guild_id: int) -> None:
             {"$set": default_cfig()}
         )
     except Exception as e:
-        print(f"Error when resetting a guilds config: {e}")
+        log(f"Error when resetting a guilds config: {e}", "critical")
 
 async def set_channel_config(
     guild_id: int,
@@ -109,7 +110,7 @@ async def set_channel_config(
         await update_guild_config(guild_id, "CHANNEL_CONFIG", channel_config)
         return new_config
     except Exception as e:
-        print(f"Error adding/updating channel config: {e}")
+        log(f"Error adding/updating channel config: {e}", "critical")
 
 async def remove_channel_config(guild_id: int, channel_id: int) -> bool:
     """Removes a channel config and returns true if successful, otherwise false"""
@@ -142,5 +143,5 @@ async def get_channel_config(guild_id: int, channel_id: int) -> dict:
         config.pop("CHANNEL_CONFIG", None)
         return config
     except Exception as e:
-        print(f"Error retrieving channel config: {e}")
+        log(f"Error retrieving channel config: {e}", "critical")
         return {}

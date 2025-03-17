@@ -178,7 +178,6 @@ class Channel_config(commands.Cog):
             return await interaction.followup.send(f"<#{channel.id}> does not have a channel config to remove!", ephemeral=True)
         else:
             await interaction.followup.send(f"Successfully deleted the channel config for <#{channel.id}>")
-        print(f"{interaction.user.display_name} used the channel-config/remove command in {interaction.channel.name}/{interaction.guild.name}")
         internal_print_log_message(interaction, "channel-config/remove")
     
 

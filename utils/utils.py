@@ -1,17 +1,12 @@
 import discord
 import bot.settings as settings
 import re
-# from deep_translator import GoogleTranslator
-# from langdetect import detect, DetectorFactory
 from db.config_manager import update_guild_config
+from i_logger.logger import log
 
 # Custom made translation API
 from TranslationAPI.constants import LANGUAGES, FLAGS
-from TranslationAPI.translate import translate
-from TranslationAPI.detect import detect
 
-
-# TODO: Completely changed up the flag system, now we use custom flags
 def cc_to_flag(country_code: str) -> str:
     """Convert a country code into its flag variant"""
 
@@ -52,7 +47,7 @@ def replace_mentions(message: discord.Message, content: str) -> str:
 
 def internal_print_log_message(interaction, command_name = "UNKNOWN") -> None:
     """Function that prints on command usage"""
-    print(f"{interaction.user.display_name} used the {command_name} command in {interaction.channel.name}/{interaction.guild.name}")
+    log(f"{interaction.user.display_name} used the {command_name} command in {interaction.channel.name}/{interaction.guild.name}", "command")
 
 def valid_code(code: str):
     """Validate whether the given language code is a real language code.
@@ -88,12 +83,9 @@ async def f_target_lang(value: str, interaction: discord.Interaction, supress: b
 
 async def f_ignore_langs(value: str, interaction: discord.Interaction, supress: bool = False) -> list:
     # Make the value lowercase, stripped, and replacing any spaces with empty characters 
-    print("called")
     if value == "nothing":
         value = []
-        print("nothing")
     else:
-        print("something")
         value = value.lower().strip().replace(" ", "")
         
         # If there are multiple languages specified

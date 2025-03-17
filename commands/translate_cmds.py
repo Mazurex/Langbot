@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-from utils.utils import valid_code
+from utils.utils import valid_code, internal_print_log_message
+from i_logger.logger import log
 import math
 
 # Custom made translation API
@@ -97,10 +98,10 @@ class TranslateCmds(commands.Cog):
             # Create the response for the message, showing what language its translating from and to
             response = f"**[{LANGUAGES[lang_from].capitalize()} ➜ {LANGUAGES[target].capitalize()}]**\n{translated}"
             await interaction.response.send_message(response, ephemeral=True)
-            print(f"{interaction.user.display_name} used the translate command in {interaction.channel.name}/{interaction.guild.name}")
+            internal_print_log_message(interaction, "translate")
         except Exception as e:
             await interaction.response.send_message("There was an error with this command!", ephemeral=True)
-            print(f"Error with translate command: {e}")
+            log(f"Error with translate command: {e}", "critical")
     
     # Create info about the command
     @discord.app_commands.command(name="supported", description="View a paginated embed of all supported languages")
@@ -115,7 +116,7 @@ class TranslateCmds(commands.Cog):
         embed = view.format_page()
         
         await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-        print(f"{interaction.user.display_name} used the supported command in {interaction.channel.name}/{interaction.guild.name}")
+        internal_print_log_message(interaction, "supported")
 
 # Setup the commands
 async def setup(bot):

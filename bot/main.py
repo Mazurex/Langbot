@@ -25,15 +25,16 @@ from utils.utils import replace_mentions, format_reply
 from db.database import get_database
 from db.config_manager import get_guild_config, get_channel_config
 
+from i_logger.logger import log
+
 # Custom made translation API
 from TranslationAPI.translate import  translate
 from TranslationAPI.detect import detect
-from TranslationAPI.constants import FLAGS
 
 db, config_collection = get_database()
 
-print(f"Database {db.name} loaded successfully!")
-print(f"Collection {config_collection.name} loaded successfully!")
+log(f"Database {db.name} loaded successfully!", "critical")
+log(f"Collection {config_collection.name} loaded successfully!", "critical")
 # Debugging mode (DEV)
 DEBUG_MODE = False
 
@@ -60,7 +61,7 @@ async def change_status():
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    log(f"Logged in as {bot.user}", "critical")
     
     # Cache all roles
     for guild in bot.guilds:
@@ -74,9 +75,9 @@ async def on_ready():
         # Sync all slash commands
         # Not ideal to do it every startup, but whatever
         synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} slash commands")
+        log(f"Synced {len(synced)} slash commands", "critical")
     except Exception as e:
-        print(f"Failed to sync commands: {e}")
+        log(f"Failed to sync commands: {e}", "critical")
 
 async def load_cogs():
     """Function to load all external commands"""
@@ -86,7 +87,7 @@ async def load_cogs():
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
-    print(f"Joined new guild: {guild.name} ({guild.id})")
+    log(f"Joined new guild: {guild.name} ({guild.id})")
 
     # Sleep for 1 second to prevent duplication in the database
     # This sometimes gets called at the same time as on_message
@@ -98,7 +99,7 @@ async def on_guild_join(guild: discord.Guild):
 
 @bot.event
 async def on_guild_leave(guild: discord.Guild):
-    print(f"Left guild: {guild.name} ({guild.id})")
+    log(f"Left guild: {guild.name} ({guild.id})")
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -126,13 +127,16 @@ async def on_message(message: discord.Message):
         # Also replace all mentions with [MENTION]
         formatted = replace_mentions(message, message.content)
         translated = translate(formatted, channel_config["TARGET_LANG"])
+        # Translate the message until it is fully in the target language (ensures multilanguage messages get translated properly)
+        while detect(translate) != channel_config["TARGET_LANG"]:
+            translated = translate(formatted, channel_config["TARGET_LANG"])
         
         def contains_ignored() -> bool:
             """A function
             that returns true
             if a given string is equal to an item in a list of ignored terms otherwise false"""
             for ignored in channel_config["IGNORED_TERMS"]:
-                if ignored == translated or ignored == formatted:
+                if ignored.lower() == translated.lower() or ignored.lower() == formatted.lower():
                     return True
             return False
 
@@ -141,12 +145,12 @@ async def on_message(message: discord.Message):
         if not contains_ignored():
             # If the value of translation is None, the detected language is not valid
             if translate is None:
-                print(f"{detected} is not a valid language to translate!")
+                log(f"{detected} is not a valid language to translate!", "critical")
             else:
                 # Only send the translated message if it is different from the original message,
                 # And if the user does NOT have a blacklisted role
                 if translated.lower() != message.content.lower() and not any(role.id in channel_config["BLACKLISTED_ROLES"] for role in message.author.roles):
-                    print(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}")
+                    log(f"Message sent by {message.author.display_name} translated in {message.channel.name}/{message.guild.name}", "command")
                     # Format the reply through another function, allowing customizability for each guild
                     formatted_reply = format_reply(channel_config["TRANSLATE_REPLY_MESSAGE"], translated, message, detected)
                     

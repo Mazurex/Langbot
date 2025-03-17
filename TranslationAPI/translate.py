@@ -2,6 +2,8 @@ from typing import Literal
 
 import requests
 
+from i_logger.logger import log
+
 from TranslationAPI.constants import _HEADERS, _GOOGLE_TRANSLATE_URL, LANGUAGES
 
 def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"] | str = "auto") -> str:
@@ -10,7 +12,7 @@ def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"]
     if target_lang not in LANGUAGES.keys():
         # Not a valid language name
         if target_lang not in LANGUAGES.values():
-            raise Exception(f"Target language {target_lang} is not a valid language")
+            log("Target language {target_lang} is not a valid language", "critical")
         else:
             # Convert language name to language code
             target_lang = {v: k for k, v in LANGUAGES.items()}[target_lang]
@@ -19,7 +21,7 @@ def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"]
     if source_lang not in LANGUAGES.keys() and source_lang != "auto":
         # Not a valid language name
         if source_lang not in LANGUAGES.keys():
-            raise Exception(f"Target language {target_lang} is not a valid language")
+            log("Target language {target_lang} is not a valid language", "critical")
         else:
             # Convert language name to code
             source_lang = {v: k for k, v in LANGUAGES.items()}[source_lang]

@@ -2,7 +2,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from db.config_manager import get_guild_config, update_guild_config, reset_guild_config
-from utils.utils import LANGUAGES, f_translation_reply_message, f_target_lang, f_ignore_langs, f_ignore_bots, f_ignored_terms, f_reply, f_blacklisted_roles, f_auto_translate
+from utils.utils import LANGUAGES, f_translation_reply_message, f_target_lang, f_ignore_langs, f_ignore_bots, f_ignored_terms, f_reply, f_blacklisted_roles, f_auto_translate, internal_print_log_message
+from i_logger.logger import log
 
 # All customize commands here have an option value parameter
 # If no value is given, instead send an embed for what the command does
@@ -91,13 +92,13 @@ class Config(commands.Cog):
         embed.add_field(name="Auto Translate", value=db_config["AUTO_TRANSLATE"], inline=False)
         
         await interaction.followup.send(embed=embed, ephemeral=True)
-        print(f"{interaction.user.display_name} used the config/view command in {interaction.channel.name}/{interaction.guild.name}")
+        internal_print_log_message(interaction, "config/view")
     
     async def reset(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         await reset_guild_config(interaction.guild_id)
         await interaction.followup.send("I have reset all LangBot configurations for this guild!", ephemeral=True)
-        print(f"{interaction.user.display_name} used the config/reset command in {interaction.channel.name}/{interaction.guild.name}")
+        internal_print_log_message(interaction, "config/reset")
     
     async def translation_reply_message(
         self, interaction: discord.Interaction,
@@ -155,13 +156,13 @@ class Config(commands.Cog):
                 )
                 
                 await interaction.followup.send(embed=embed, ephemeral=True)
-                print(f"{interaction.user.display_name} used the config/target-lang command in {interaction.channel.name}/{interaction.guild.name}")
+                internal_print_log_message(interaction, "config/target-lang")
             else:
                 # External function
                 value = await f_target_lang(value, interaction)
                 await interaction.followup.send(f'Successfully updated "Target Language" to `{LANGUAGES[value].capitalize()}`', ephemeral=True)
         except Exception as e:
-            print(e)
+            log(e, "critical")
 
     async def ignore_langs(
         self, interaction: discord.Interaction,
@@ -252,7 +253,7 @@ class Config(commands.Cog):
             )
             
             await interaction.followup.send(embed=embed, ephemeral=True)
-            print(f"{interaction.user.display_name} used the config/ignored-terms command in {interaction.channel.name}/{interaction.guild.name}")
+            internal_print_log_message(interaction, "config/ignored-terms")
             
         else:
             value = await f_ignored_terms(value, interaction)
