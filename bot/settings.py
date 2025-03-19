@@ -15,9 +15,4 @@ DEFAULT_AUTO_TRANSLATE = True
 
 #endregion
 
-ACTIVITY_MESSAGES = [
-"with translations",
-"with over 100 languages",
-"as your interpreter",
-"and translating"
-]
+GITHUB_REPO = "Mazurex/Langbot"

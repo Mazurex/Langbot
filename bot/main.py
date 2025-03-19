@@ -17,10 +17,10 @@ from db.database import get_database
 from db.config_manager import get_guild_config, get_channel_config
 from i_logger.logger import log
 from TranslationAPI.translate import translate
-from bot.settings import ACTIVITY_MESSAGES
+from bot.settings import GITHUB_REPO
+from external_api.latest_release import latest_github_version
 
 #endregion
-
 
 # Bots intents (rahahahaha) >:)
 intents = discord.Intents.default()
@@ -41,15 +41,9 @@ class Bot(commands.Bot):
                 guild.get_role(role.id)
             # If joined any guilds while the bot was offline, make sure to create a database entry for it
             await get_guild_config(guild.id)
-
-        async def change_status():
-            """Function that changes the bots status over a predefined list every set amount of time"""
-            while True:
-                for status in ACTIVITY_MESSAGES:
-                    await self.change_presence(activity=discord.Game(name=status))
-                    await asyncio.sleep(20 * 60) # 20 Minutes
         
-        self.loop.create_task(change_status())
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, \
+                                                            name=f"with version v{latest_github_version(GITHUB_REPO)}"))
         
         try:
             synced = await self.tree.sync()
@@ -57,7 +51,7 @@ class Bot(commands.Bot):
         except Exception as e:
             log(f"Failed to sync commands: {e}", "critical")
 
-    async def load_cogs(self):        
+    async def load_cogs(self):
         """Function to load all external commands dynamically"""        
         directory = Path("commands")
         for file in directory.iterdir():
