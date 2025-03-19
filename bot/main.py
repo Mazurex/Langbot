@@ -60,7 +60,6 @@ class Bot(commands.Bot):
         for file in directory.iterdir():
             if file.suffix == ".py" and file.name != "__init__.py":
                 await self.load_extension(f"commands.{file.stem}")
-                print(file.stem)
 
     async def on_guild_join(self, guild: discord.Guild):
         log(f"Joined new guild: {guild.name} ({guild.id})")
