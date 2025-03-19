@@ -3,6 +3,7 @@
 import os
 import sys
 import asyncio
+from pathlib import Path
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -54,10 +55,12 @@ class Bot(commands.Bot):
             log(f"Failed to sync commands: {e}", "critical")
 
     async def load_cogs(self):
-        """Function to load all external commands"""
-        await self.load_extension("commands.translate_cmds")
-        await self.load_extension("commands.config")
-        await self.load_extension("commands.channel_config")
+        """Function to load all external commands"""        
+        directory = Path("commands")
+        for file in directory.iterdir():
+            if file.suffix == ".py" and file.name != "__init__.py":
+                await self.load_extension(f"commands.{file.stem}")
+                print(file.stem)
 
     async def on_guild_join(self, guild: discord.Guild):
         log(f"Joined new guild: {guild.name} ({guild.id})")
