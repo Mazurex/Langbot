@@ -37,7 +37,10 @@ class Bot(commands.Bot):
         
         for guild in self.guilds:
             for role in await guild.fetch_roles():
-                _ = guild.get_role(role.id)
+                # Update any role changes
+                guild.get_role(role.id)
+            # If joined any guilds while the bot was offline, make sure to create a database entry for it
+            await get_guild_config(guild.id)
 
         async def change_status():
             """Function that changes the bots status over a predefined list every set amount of time"""
@@ -54,8 +57,8 @@ class Bot(commands.Bot):
         except Exception as e:
             log(f"Failed to sync commands: {e}", "critical")
 
-    async def load_cogs(self):
-        """Function to load all external commands"""        
+    async def load_cogs(self):        
+        """Function to load all external commands dynamically"""        
         directory = Path("commands")
         for file in directory.iterdir():
             if file.suffix == ".py" and file.name != "__init__.py":
