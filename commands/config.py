@@ -39,7 +39,7 @@ class Config(commands.Cog):
         """View all configurations as an embed"""
         await interaction.response.defer(ephemeral=True)
         # Get the guild config
-        db_config = await get_guild_config(interaction.guild_id)
+        db_config = await get_guild_config(interaction.guild_id) # type: ignore
         
         # Description of the embed
         description = """config refers to guild-based config, or guild-default config.
@@ -96,18 +96,18 @@ class Config(commands.Cog):
     
     async def reset(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        await reset_guild_config(interaction.guild_id)
+        await reset_guild_config(interaction.guild_id) # type: ignore
         await interaction.followup.send("I have reset all LangBot configurations for this guild!", ephemeral=True)
         internal_print_log_message(interaction, "config/reset")
     
     async def translation_reply_message(
         self, interaction: discord.Interaction,
-        value: str = None
+        value: str | None = None
     ):
         await interaction.response.defer(ephemeral=True)
         if value is None:
             # Get the guilds config
-            config = await get_guild_config(interaction.guild_id)
+            config = await get_guild_config(interaction.guild_id) # type: ignore
             description = f"""Current value: `{config["TRANSLATE_REPLY_MESSAGE"]}`
             This message will be sent when a user sends a message in another language.
             Placeholders are defined below."""
@@ -135,14 +135,14 @@ class Config(commands.Cog):
     
     async def target_lang(
         self, interaction: discord.Interaction,
-        value: str = None
+        value: str | None = None
     ):
         try:
             await interaction.response.defer(ephemeral=True)
             
             if value is None:
                 # Get the guilds config
-                config = await get_guild_config(interaction.guild_id)
+                config = await get_guild_config(interaction.guild_id) # type: ignore
                 description = f"""Current value: `{LANGUAGES[config["TARGET_LANG"]].capitalize()}`
                 The language that untranslated text should be translated into.
                 Can either be a language code (such as `en`), or language name (such as `english`).
@@ -162,15 +162,15 @@ class Config(commands.Cog):
                 value = await f_target_lang(value, interaction)
                 await interaction.followup.send(f'Successfully updated "Target Language" to `{LANGUAGES[value].capitalize()}`', ephemeral=True)
         except Exception as e:
-            log(e, "critical")
+            log(str(e), "critical")
 
     async def ignore_langs(
         self, interaction: discord.Interaction,
-        value: str = None
+        value: str | None = None
     ):
         # Defer the reply
         await interaction.response.defer(ephemeral=True)
-        config = await get_guild_config(interaction.guild_id)
+        config = await get_guild_config(interaction.guild_id) # type: ignore
         
         ignored_languages_str = "none"
         if len(config["IGNORE_LANGS"]) > 0:
@@ -195,7 +195,7 @@ class Config(commands.Cog):
             return
 
         # External function
-        value = await f_ignore_langs(value, interaction)
+        value = await f_ignore_langs(value, interaction) # type: ignore
         if not value:
             await interaction.followup.send('Successfuly disabled "Ignored Languages"')
         else:
@@ -204,13 +204,13 @@ class Config(commands.Cog):
     
     async def ignore_bots(
         self, interaction: discord.Interaction,
-        value: bool = None
+        value: bool | None = None
     ):
         await interaction.response.defer(ephemeral=True)
         
         if value is None:
             # Get the config of the guild
-            config = await get_guild_config(interaction.guild_id)
+            config = await get_guild_config(interaction.guild_id) # type: ignore
             description = f"""Current value: `{"Yes" if config["IGNORE_BOTS"] else "No"}`
             Should the bot ignore other bots, regardless of the language they send."""
             
@@ -230,10 +230,10 @@ class Config(commands.Cog):
 
     async def ignored_terms(
         self, interaction: discord.Interaction,
-        value: str = None
+        value: str | None = None
     ):
         await interaction.response.defer(ephemeral=True)
-        config = await get_guild_config(interaction.guild_id)
+        config = await get_guild_config(interaction.guild_id) # type: ignore
         
         ignored_terms_str = "none"
         if len(config["IGNORED_TERMS"]) > 0:
@@ -256,7 +256,7 @@ class Config(commands.Cog):
             internal_print_log_message(interaction, "config/ignored-terms")
             
         else:
-            value = await f_ignored_terms(value, interaction)
+            value = await f_ignored_terms(value, interaction) # type: ignore
 
             if not value:
                 await interaction.followup.send(f'Successfully disabled "Ignord Terms"', ephemeral=True)
@@ -265,13 +265,13 @@ class Config(commands.Cog):
 
     async def reply(
         self, interaction: discord.Interaction,
-        value: bool = None
+        value: bool | None = None
     ):
         await interaction.response.defer(ephemeral=True)
         
         if value is None:
             # Get the config of the guild
-            config = await get_guild_config(interaction.guild_id)
+            config = await get_guild_config(interaction.guild_id) # type: ignore
             description = f"""Current value: `{"Yes" if config["REPLY"] else "No"}`
             Should the bot reply to the original untranslated message"""
             
@@ -286,18 +286,18 @@ class Config(commands.Cog):
             
         else:
             # External command
-            value = await f_reply(value, interaction)
+            value = await f_reply(value, interaction) # type: ignore
             await interaction.followup.send(f'Successfully updated "Reply" to `{"Yes" if value else "No"}`', ephemeral=True)
 
     async def blacklisted_roles(
         self, interaction: discord.Interaction,
-        value: str = None
+        value: str | None = None
     ):
         await interaction.response.defer(ephemeral=True)
         
         if value is None:
             # Get the config of the guild
-            config = await get_guild_config(interaction.guild_id)
+            config = await get_guild_config(interaction.guild_id) # type: ignore
             description = f"""Current value: `{", ".join(map(str, config["BLACKLISTED_ROLES"])) if len(config["BLACKLISTED_ROLES"]) > 0 else "nothing"}`
             If a user has any of these roles, the bot will not translate their messages.
             You can enter role mentions, everything else will be ignored.
@@ -311,23 +311,24 @@ class Config(commands.Cog):
             
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
-        result, value = await f_blacklisted_roles(value, interaction)
+        result, value = await f_blacklisted_roles(value, interaction) # type: ignore
 
         if result is False:
             return await interaction.followup.send(f"All roles given were invalid, are they correct? Are they in this guild?", ephemeral=True)
-        if len(value) == 0:
+        if len(value) == 0: # type: ignore
             return await interaction.followup.send(f'Successfully set "Blacklisted Roles" to `nothing`')
 
-        await interaction.followup.send(f'Successfully updated "Blacklisted Roles" to {", ".join([f"<@&{role_id}>" for role_id in value])}', ephemeral=True)
+        await interaction.followup.send(f'Successfully updated "Blacklisted Roles" to {", ".join([f"<@&{role_id}>" for role_id in value])}', ephemeral=True) # type: ignore
 
     async def auto_translate(self, interaction: discord.Interaction,
-                            value: bool = None):
+                            value: bool | None = None):
         await interaction.response.defer(ephemeral=True)
         
         
         if value is None:
-            config = get_guild_config(interaction.guild_id)
-            description = f"""Current value: `{"Yes" if config["AUTO_TRANSLATE"] else "No"}`
+            config = get_guild_config(interaction.guild_id) # type: ignore
+            auto_translate = config["AUTO_TRANSLATE"] # type: ignore (python still being stupid)
+            description = f"""Current value: `{"Yes" if auto_translate else "No"}`
             Should the bot automatically translate messages"""
 
             # The embed to reply with
@@ -341,7 +342,7 @@ class Config(commands.Cog):
             
         else:
             # External command
-            value = await f_auto_translate(value, interaction)
+            value = await f_auto_translate(value, interaction) # type: ignore
             await interaction.followup.send(f'Successfully updated "Auto Translate" to `{"Yes" if value else "No"}`', ephemeral=True)
 
 # Setup the commands

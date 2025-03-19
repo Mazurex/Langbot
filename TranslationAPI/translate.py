@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Tuple
 
 import requests
 
@@ -6,7 +6,7 @@ from i_logger.logger import log
 
 from TranslationAPI.constants import _HEADERS, _GOOGLE_TRANSLATE_URL, LANGUAGES
 
-def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"] | str = "auto") -> str:
+def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"] | str = "auto") -> Tuple[str, str]:
     """Function to translate a given source using the Google API"""
     # Not a valid language code
     if target_lang not in LANGUAGES.keys():
@@ -46,4 +46,4 @@ def translate(source: str, target_lang: str = "en", source_lang: Literal["auto"]
         return translated_text, response.json()[2].lower()
     except:
         # Error: Return the original source message
-        return source
+        return source, source_lang

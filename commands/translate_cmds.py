@@ -76,15 +76,15 @@ class TranslateCmds(commands.Cog):
     async def translate(
         self, interaction: discord.Interaction,
         text: str,
-        target: str = None
+        target: str | None = None
     ):
-        config = await get_guild_config(interaction.guild_id)
-        channel_config = await get_channel_config(interaction.guild_id, interaction.channel_id)
+        config = await get_guild_config(interaction.guild_id) # type: ignore
+        channel_config = await get_channel_config(interaction.guild_id, interaction.channel_id) # type: ignore
         # If the user doesn't specify a language, set it to the target language in the guild's channel/global config
         if target is None:
             target = channel_config["TARGET_LANG"]
         
-        is_valid, target = valid_code(target.lower())
+        is_valid, target = valid_code(target.lower()) # type: ignore
 
         if not is_valid:
             return await interaction.response.send_message(f"`{target}` is not a valid country code/name, run `/supported` to view all valid country codes", ephemeral=True)
@@ -109,7 +109,7 @@ class TranslateCmds(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         
         # Create an instance of the paginator
-        view = LanguagePaginator(user=interaction.user, languages=LANGUAGES)
+        view = LanguagePaginator(user=interaction.user, languages=LANGUAGES) # type: ignore
         # Embed for each page
         embed = view.format_page()
         

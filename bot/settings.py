@@ -1,3 +1,5 @@
+#region Default Database Settings
+
 # All default settings
 # This will only be used when a guild doesn't have a config
 # or if an admin resets that guild's config
@@ -10,3 +12,12 @@ DEFAULT_REPLY = True
 DEFAULT_BLACKLISTED_ROLES = []
 DEFAULT_CHANNEL_CONFIG = {}
 DEFAULT_AUTO_TRANSLATE = True
+
+#endregion
+
+ACTIVITY_MESSAGES = [
+"with translations",
+"with over 100 languages",
+"as your interpreter",
+"and translating"
+]

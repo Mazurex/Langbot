@@ -1,6 +1,5 @@
 import os
 import motor.motor_asyncio
-from dotenv import load_dotenv
 
 # Setup the database with the mongodb uri in the env
 client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("URI"))

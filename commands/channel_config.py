@@ -52,7 +52,7 @@ class ChannelConfigPaginator(discord.ui.View):
         """Ensures only the command author can use the buttons"""
         return interaction.user == self.user
     
-    @discord.ui.button(label="<", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="<", style=discord.ButtonStyle.blurple) # type: ignore
     async def previous_page(self, interaction:discord.Interaction, button=discord.ui.Button):
         """Go to the previous page"""
         if self.current_page > 0:
@@ -61,7 +61,7 @@ class ChannelConfigPaginator(discord.ui.View):
             self.current_page = self.total_pages - 1
         await self.update_message(interaction)
 
-    @discord.ui.button(label=">", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label=">", style=discord.ButtonStyle.blurple) # type: ignore
     async def next_page(self, interaction:discord.Interaction, button=discord.ui.Button):
         """Go to the next page"""
         if self.current_page < self.total_pages - 1:
@@ -92,7 +92,7 @@ class Channel_config(commands.Cog):
     async def view(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         
-        config = await get_guild_config(interaction.guild_id)
+        config = await get_guild_config(interaction.guild_id) # type: ignore
         channel_config = config.get("CHANNEL_CONFIG")
         
         if not channel_config:
@@ -103,7 +103,7 @@ class Channel_config(commands.Cog):
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
         
-        view = ChannelConfigPaginator(interaction.user, channel_config)
+        view = ChannelConfigPaginator(interaction.user, channel_config) # type: ignore
         embed = view.format_page()
         
         await interaction.followup.send(embed=embed, view=view, ephemeral=True)
@@ -122,22 +122,22 @@ class Channel_config(commands.Cog):
     async def set(
         self, interaction: discord.Interaction,
         channel: discord.TextChannel,
-        translate_reply_message: str = None,
-        target_language: str = None,
-        ignore_languages: str = None,
-        ignore_bots: bool = None,
-        blacklisted_terms: str = None,
-        reply: bool = None,
-        blacklisted_roles: str = None,
-        auto_translate: bool = None
+        translate_reply_message: str | None = None,
+        target_language: str | None = None,
+        ignore_languages: str | None = None,
+        ignore_bots: bool | None = None,
+        blacklisted_terms: str | None = None,
+        reply: bool | None = None,
+        blacklisted_roles: str | None = None,
+        auto_translate: bool | None = None,
     ):
         await interaction.response.defer(ephemeral=True)
         
-        channel_config = await set_channel_config(interaction.guild_id, channel.id,
+        channel_config = await set_channel_config(interaction.guild_id, channel.id, # type: ignore
                                 translate_reply_message, target_language,
-                                ignore_languages, ignore_bots,
-                                blacklisted_terms, reply,
-                                blacklisted_roles, auto_translate)
+                                ignore_languages, ignore_bots, # type: ignore
+                                blacklisted_terms, reply, # type: ignore (python bugging like usual)
+                                blacklisted_roles, auto_translate) # type: ignore
 
         ignored_languages_str = "none"
         if len(channel_config["IGNORED_LANGS"]) > 0:
@@ -172,14 +172,13 @@ class Channel_config(commands.Cog):
     ):
         await interaction.response.defer(ephemeral=True)
         
-        removed = await remove_channel_config(interaction.guild_id, channel.id)
+        removed = await remove_channel_config(interaction.guild_id, channel.id) # type: ignore
         
         if not removed:
             return await interaction.followup.send(f"<#{channel.id}> does not have a channel config to remove!", ephemeral=True)
         else:
             await interaction.followup.send(f"Successfully deleted the channel config for <#{channel.id}>")
         internal_print_log_message(interaction, "channel-config/remove")
-    
 
 # Setup the commands
 async def setup(bot):

@@ -2,7 +2,7 @@ from typing import Literal
 import datetime
 import os
 
-def log(log_content: str, log_type: Literal["critical", "command", "generic"] = "generic"):
+def log(log_content: str, log_type: Literal["critical", "command", "generic"] = "generic", print_to_console: bool = False):
     # Correct date format, converting datetime object into a string
     date_format = datetime.datetime.now().strftime("[%Y/%m/%d][%H.%M.%S]")
     # The layout of the log to be send
@@ -30,6 +30,9 @@ def log(log_content: str, log_type: Literal["critical", "command", "generic"] = 
             file_header_message = ""
     except FileNotFoundError:
         pass
+    
+    if print_to_console:
+        print(log_content)
 
     # Open the specific log file
     with open("logs/" + file_to_open, "a", encoding="utf-8") as file:

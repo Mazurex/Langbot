@@ -6,7 +6,7 @@ from i_logger.logger import log
 # Get the database information from another function
 db, config_collection = get_database()
 
-def default_cfig(guild_id: str | None = None, remove_channel_config: bool = False) -> dict:
+def default_cfig(guild_id: int | None = None, remove_channel_config: bool = False) -> dict:
     """Function that returns the default config with an optional guild_id param"""
     cfig = {
         "TRANSLATE_REPLY_MESSAGE": settings.DEFAULT_REPLY_MESSAGE,
@@ -43,6 +43,7 @@ async def get_guild_config(guild_id: int) -> dict:
         return config
     except Exception as e:
         log(f"Error with getting a guilds config: {e}", "critical")
+    return {}
 
 
 async def update_guild_config(guild_id: int, key: str, value) -> None:
@@ -68,14 +69,14 @@ async def reset_guild_config(guild_id: int) -> None:
 async def set_channel_config(
     guild_id: int,
     channel_id: int,
-    translate_reply_message: str = None,
-    target_lang: str = None,
-    ignore_langs: list = None,
-    ignore_bots: bool = None,
-    reply: bool = None,
-    blacklisted_roles: list = None,
-    ignored_terms: list = None,
-    auto_translate: bool = None
+    translate_reply_message: str | None = None,
+    target_lang: str | None = None,
+    ignore_langs: list | None = None,
+    ignore_bots: bool | None = None,
+    reply: bool | None = None,
+    blacklisted_roles: list | None = None,
+    ignored_terms: list | None = None,
+    auto_translate: bool | None = None
 ) -> dict:
     """Creates/Updates a channel specfic config"""
     try:
@@ -90,7 +91,7 @@ async def set_channel_config(
         if target_lang is None: target_lang = config.get("TARGET_LANG")
         if ignore_langs is None: ignore_langs = config.get("IGNORE_LANGS")
         if ignore_bots is None: ignore_bots = config.get("IGNORE_BOTS")
-        if ignored_terms is None: blacklisted_terms = config.get("IGNORED_TERMS")
+        if ignored_terms is None: ignored_terms = config.get("IGNORED_TERMS")
         if reply is None: reply = config.get("REPLY")
         if blacklisted_roles is None: blacklisted_roles = config.get("BLACKLISTED_ROLES")
         if auto_translate is None: auto_translate = config.get("AUTO_TRANSLATE")
@@ -100,7 +101,7 @@ async def set_channel_config(
             "TARGET_LANG": target_lang,
             "IGNORE_LANGS": ignore_langs,
             "IGNORE_BOTS": ignore_bots,
-            "IGNORED_TERMS": blacklisted_terms,
+            "IGNORED_TERMS": ignored_terms,
             "REPLY": reply,
             "BLACKLISTED_ROLES": blacklisted_roles,
             "AUTO_TRANSLATE": auto_translate
@@ -111,6 +112,7 @@ async def set_channel_config(
         return new_config
     except Exception as e:
         log(f"Error adding/updating channel config: {e}", "critical")
+    return {}
 
 async def remove_channel_config(guild_id: int, channel_id: int) -> bool:
     """Removes a channel config and returns true if successful, otherwise false"""
