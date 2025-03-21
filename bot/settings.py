@@ -1,4 +1,4 @@
-#region Default Database Settings
+# region Default Database Settings
 
 # All default settings
 # This will only be used when a guild doesn't have a config
@@ -13,6 +13,6 @@ DEFAULT_BLACKLISTED_ROLES = []
 DEFAULT_CHANNEL_CONFIG = {}
 DEFAULT_AUTO_TRANSLATE = True
 
-#endregion
+# endregion
 
 GITHUB_REPO = "Mazurex/Langbot"
