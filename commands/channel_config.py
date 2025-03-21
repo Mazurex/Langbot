@@ -114,7 +114,6 @@ class Channel_config(commands.Cog):
             description="Channel based configuration",
             default_permissions=discord.Permissions(administrator=True),
         )
-        # Init all commands as children of channel-config
         self.config.command(
             name="view",
             description="View information and current configurations related to this command",
