@@ -23,7 +23,6 @@ from external_api.latest_release import latest_github_version
 # endregion
 
 
-# Bots intents (rahahahaha) >:)
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
