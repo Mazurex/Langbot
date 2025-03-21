@@ -126,8 +126,7 @@ class Channel_config(commands.Cog):
         self.config.command(
             name="remove", description="Remove a channel based configuration"
         )(self.remove)
-        # ...
-        # Add this parent command to the command tree
+
         self.bot.tree.add_command(self.config)
 
     async def view(self, interaction: discord.Interaction):
