@@ -107,8 +107,6 @@ class Channel_config(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        # Make config the parent command, with every other command in here being a subcommand
-        # A user must have admin perms to use any commands here
         self.config = app_commands.Group(
             name="channel-config",
             description="Channel based configuration",
