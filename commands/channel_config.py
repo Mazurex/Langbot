@@ -246,7 +246,5 @@ class Channel_config(commands.Cog):
         internal_print_log_message(interaction, "channel-config/remove")
 
 
-# Setup the commands
 async def setup(bot):
-    # Add the commands cog
     await bot.add_cog(Channel_config(bot))
