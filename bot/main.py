@@ -51,7 +51,7 @@ class Bot(commands.Bot):
 
         try:
             synced = await self.tree.sync()
-            log(f"Synced {len(synced)} slash commands", "critical")
+            log(f"Synced {len(synced)} slash commands", "critical", True)
         except Exception as e:
             log(f"Failed to sync commands: {e}", "critical")
 

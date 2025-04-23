@@ -1,0 +1,29 @@
+# Prevent virtual environments & Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+.env
+.env.*
+*.log
+.vscode/
+.idea/
+.venv/
+db.txt
+logs/
+art/
+*.tar
+*.gz
+*.zip
+.DS_Store
+node_modules/
+
+# Git stuff
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
